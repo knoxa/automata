@@ -40,6 +40,7 @@ public class Options {
 						action.setActor(square);
 						action.setSense(sense);
 						action.setAct(Act.ATTACH);
+						action.setProbability(0.3);
 						Maps.addMapValue(options, reverse.get(square).iterator().next(), action);
 					}
 					else if ( partSize <= 3 && partSize <= neighbourSize && neighbourSize <= 4 ) {
