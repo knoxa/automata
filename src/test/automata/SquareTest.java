@@ -1,4 +1,4 @@
-package test.cells;
+package test.automata;
 
 import static org.junit.jupiter.api.Assertions.*;
 

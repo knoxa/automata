@@ -72,8 +72,8 @@ public class Square {
 					// found a square to report ...
 					
 					Sense sense = new Sense();
-					sense.direction = leftOrRight;
-					sense.square = corner.getNeighbour(back);
+					sense.setDirection(leftOrRight);;
+					sense.setSquare(corner.getNeighbour(back));
 					retval.add(sense);
 				}
 			}

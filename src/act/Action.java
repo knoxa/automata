@@ -1,6 +1,10 @@
-package cells;
+package act;
 
 import java.util.Set;
+
+import cells.Direction;
+import cells.Sense;
+import cells.Square;
 
 public class Action {
 
@@ -62,24 +66,24 @@ public class Action {
 			//System.out.println(" ... " + from + " - " + diagonal.direction + ", " + diagonal.square);
 			//System.out.println("   diagonal - " + from + "; " + diagonal.square );
 
-			if ( from.getNeighbour(diagonal.direction) == null ) {
+			if ( from.getNeighbour(diagonal.getDirection()) == null ) {
 				
-				from.setNeighbour(diagonal.direction, diagonal.square);
-				returnDirection = from.getReturnDirection(diagonal.direction);
-				diagonal.square.setNeighbour(returnDirection, from);
+				from.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
+				returnDirection = from.getReturnDirection(diagonal.getDirection());
+				diagonal.getSquare().setNeighbour(returnDirection, from);
 			}
 		}
 
 		for ( Sense diagonal: to.diagonal(returnDirection) ) {
 			
-			System.out.println(" ... " + to + " - " + diagonal.direction + ", " + diagonal.square);
-			System.out.println("   diagonal - " + to + "; " + diagonal.square );
+			System.out.println(" ... " + to + " - " + diagonal.getDirection() + ", " + diagonal.getSquare());
+			System.out.println("   diagonal - " + to + "; " + diagonal.getSquare() );
 
-			if ( to.getNeighbour(diagonal.direction) == null ) {
+			if ( to.getNeighbour(diagonal.getDirection()) == null ) {
 				
-				to.setNeighbour(diagonal.direction, diagonal.square);
-				returnDirection = to.getReturnDirection(diagonal.direction);
-				diagonal.square.setNeighbour(returnDirection, to);
+				to.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
+				returnDirection = to.getReturnDirection(diagonal.getDirection());
+				diagonal.getSquare().setNeighbour(returnDirection, to);
 			}
 		}
 	}
@@ -110,12 +114,12 @@ public class Action {
 		
 		for ( Action action: options ) {
 			
-			System.out.println(".. " + action.actor + " *" + action.act +"* --> " + action.sense.direction + " " + action.sense.square);
+			System.out.println(".. " + action.actor + " *" + action.act +"* --> " + action.sense.getDirection() + " " + action.sense.getSquare());
 					
 			switch (action.act) {
 			
 			case ATTACH:
-				Action.attach(action.actor, action.sense.direction, action.sense.square);
+				Action.attach(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
 			case DETACH:
@@ -123,11 +127,11 @@ public class Action {
 				break;
 				
 			case CAPTURE:
-				Action.capture(action.actor, action.sense.direction, action.sense.square);
+				Action.capture(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
 			case DEFECT:
-				Action.defect(action.actor, action.sense.direction, action.sense.square);
+				Action.defect(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 			}
 		}	
