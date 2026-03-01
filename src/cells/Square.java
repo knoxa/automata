@@ -1,7 +1,6 @@
 package cells;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -10,17 +9,10 @@ public class Square {
 
 	Map<Direction, Square> neighbours;
 	String label = "*";
-	private Direction[] compass = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
-	Map<Direction, Integer> compassMap; 
 
 	public Square() {
 
 		neighbours = new EnumMap<Direction, Square>(Direction.class);
-		compassMap = new HashMap<Direction, Integer>();
-		compassMap.put(Direction.NORTH, 0);
-		compassMap.put(Direction.EAST, 1);
-		compassMap.put(Direction.SOUTH, 2);
-		compassMap.put(Direction.WEST, 3);
 	}
 	
 	public void setLabel(String label) {
@@ -112,13 +104,8 @@ public class Square {
 	
 	public Set<Square> getNeighbours() {
 		
-		Set<Square> retval = new HashSet<Square>();
-		
-		for ( int i = 0; i < 4; i++ ) {
-			
-			if (neighbours.get(compass[i]) != null ) retval.add(neighbours.get(compass[i]));
-		}
-
+		Set<Square> retval = new HashSet<Square>();	
+		for ( Direction d: neighbours.keySet() )  retval.add(neighbours.get(d));
 		return retval;		
 	}
 	
