@@ -6,6 +6,7 @@ import java.util.Set;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
+import observe.SquareObserver;
 import cells.Compass;
 
 public class Action {
@@ -63,7 +64,9 @@ public class Action {
 
 		//System.out.println( from + " from.. " + from.diagonal()); 
 		
-		for ( Sense diagonal: from.diagonal(step) ) {
+		SquareObserver s;
+		
+		for ( Sense diagonal: SquareObserver.diagonal(from, step) ) {
 			
 			//System.out.println(" ... " + from + " - " + diagonal.direction + ", " + diagonal.square);
 			//System.out.println("   diagonal - " + from + "; " + diagonal.square );
@@ -76,7 +79,7 @@ public class Action {
 			}
 		}
 
-		for ( Sense diagonal: to.diagonal(returnDirection) ) {
+		for ( Sense diagonal: SquareObserver.diagonal(to, returnDirection) ) {
 			
 			System.out.println(" ... " + to + " - " + diagonal.getDirection() + ", " + diagonal.getSquare());
 			System.out.println("   diagonal - " + to + "; " + diagonal.getSquare() );
