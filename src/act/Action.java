@@ -1,11 +1,12 @@
 package act;
 
+import java.util.Map;
 import java.util.Set;
 
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
-import cells.World;
+import cells.Compass;
 
 public class Action {
 
@@ -55,7 +56,7 @@ public class Action {
 	public static void attach(Square from, Direction step, Square to) {
 		
 		from.setNeighbour(step, to);
-		Direction returnDirection = World.getReturnDirection(step);
+		Direction returnDirection = Compass.getReturnDirection(step);
 		to.setNeighbour(returnDirection, from);
 		
 		// also link "from" to adjacent squares that are diagonal to "to"
@@ -70,7 +71,7 @@ public class Action {
 			if ( from.getNeighbour(diagonal.getDirection()) == null ) {
 				
 				from.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = World.getReturnDirection(diagonal.getDirection());
+				returnDirection = Compass.getReturnDirection(diagonal.getDirection());
 				diagonal.getSquare().setNeighbour(returnDirection, from);
 			}
 		}
@@ -83,7 +84,7 @@ public class Action {
 			if ( to.getNeighbour(diagonal.getDirection()) == null ) {
 				
 				to.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = World.getReturnDirection(diagonal.getDirection());
+				returnDirection = Compass.getReturnDirection(diagonal.getDirection());
 				diagonal.getSquare().setNeighbour(returnDirection, to);
 			}
 		}
@@ -92,23 +93,35 @@ public class Action {
 	public static void detach(Square from, Direction step, Square to) {
 		
 		from.clearNeighbour(step);
+		to.clearNeighbour(Compass.getReturnDirection(step));
 	}
 	
 	public static void detach(Square square) {
 		
-		square.clearNeighbours();
+		clearNeighbours(square);
 	}
 	
 	public static void capture(Square from, Direction step, Square to) {
 		
-		to.clearNeighbours();
+		detach(to);
 		attach(from, step, to);
 	}
 	
 	public static void defect(Square from, Direction step, Square to) {
 		
-		from.clearNeighbours();
+		detach(from);
 		attach(from, step, to);
+	}
+	
+	private static void clearNeighbours(Square square) {
+		
+		Map<Direction, Square> neighbours = square.getNeighbourMap();
+		
+		for ( Direction direction: neighbours.keySet() ) {
+			
+			square.clearNeighbour(direction);
+			neighbours.get(direction).clearNeighbour(Compass.getReturnDirection(direction));
+		}
 	}
 
 	public static void makeMoves(Set<Action> options) {

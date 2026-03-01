@@ -9,7 +9,7 @@ import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
-import world.Board;
+import worlds.Board;
 
 public class BoardObserver {
 

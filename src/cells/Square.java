@@ -48,8 +48,10 @@ public class Square {
 		// look for squares that you can get to by going one step forward (in given direction), 
 		// then either left or right, then one step back.
 		
-		Set<Direction> orthogonal = World.getOrthogonalDirections(forward);
-		Direction back = World.getReturnDirection(forward);
+		// move this method elsewhere?
+		
+		Set<Direction> orthogonal = Compass.getOrthogonalDirections(forward);
+		Direction back = Compass.getReturnDirection(forward);
 		
 		Square inFront = neighbours.get(forward);
 		
@@ -109,16 +111,13 @@ public class Square {
 		return retval;		
 	}
 	
-	public void clearNeighbours() {
+	public Map<Direction, Square> getNeighbourMap() {
 		
-		for ( Direction d: neighbours.keySet() ) {
-			
-			Square neighbour = neighbours.get(d);
-			neighbour.clearNeighbour(World.getReturnDirection(d));
-			clearNeighbour(d);
-		}
+		Map<Direction, Square> retval = new EnumMap<>(Direction.class);
+		retval.putAll(neighbours);		
+		return retval;		
 	}
-	
+		
 	public void clearNeighbour(Direction d) {
 		
 		neighbours.remove(d);

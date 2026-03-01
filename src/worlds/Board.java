@@ -1,4 +1,4 @@
-package world;
+package worlds;
 
 import java.util.HashSet;
 import java.util.Set;
