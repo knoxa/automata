@@ -5,6 +5,7 @@ import java.util.Set;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
+import cells.World;
 
 public class Action {
 
@@ -54,12 +55,12 @@ public class Action {
 	public static void attach(Square from, Direction step, Square to) {
 		
 		from.setNeighbour(step, to);
-		Direction returnDirection = from.getReturnDirection(step);
+		Direction returnDirection = World.getReturnDirection(step);
 		to.setNeighbour(returnDirection, from);
 		
 		// also link "from" to adjacent squares that are diagonal to "to"
 
-		//System.out.println( from + " from.. " + from.diagonal());
+		//System.out.println( from + " from.. " + from.diagonal()); 
 		
 		for ( Sense diagonal: from.diagonal(step) ) {
 			
@@ -69,7 +70,7 @@ public class Action {
 			if ( from.getNeighbour(diagonal.getDirection()) == null ) {
 				
 				from.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = from.getReturnDirection(diagonal.getDirection());
+				returnDirection = World.getReturnDirection(diagonal.getDirection());
 				diagonal.getSquare().setNeighbour(returnDirection, from);
 			}
 		}
@@ -82,7 +83,7 @@ public class Action {
 			if ( to.getNeighbour(diagonal.getDirection()) == null ) {
 				
 				to.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = to.getReturnDirection(diagonal.getDirection());
+				returnDirection = World.getReturnDirection(diagonal.getDirection());
 				diagonal.getSquare().setNeighbour(returnDirection, to);
 			}
 		}

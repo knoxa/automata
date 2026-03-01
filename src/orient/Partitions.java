@@ -10,6 +10,7 @@ import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
+import cells.World;
 
 public class Partitions {
 
@@ -75,13 +76,13 @@ public class Partitions {
 				
 				if ( neighbour != null ) {
 					
-					Square thisSquare = neighbour.getNeighbour(square.getReturnDirection(direction));
+					Square thisSquare = neighbour.getNeighbour(World.getReturnDirection(direction));
 					
 					if ( thisSquare == null || thisSquare != square ) {
 						
 						System.err.println("DIRECTIONS DON'T MATCH: " + square);
 						System.err.println(square + "-- " + direction + " --> " + neighbour);
-						System.err.println(neighbour + "-- " + square.getReturnDirection(direction) + " --> " + thisSquare);
+						System.err.println(neighbour + "-- " + World.getReturnDirection(direction) + " --> " + thisSquare);
 						System.exit(0);
 					}
 				}

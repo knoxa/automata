@@ -56,8 +56,8 @@ public class Square {
 		// look for squares that you can get to by going one step forward (in given direction), 
 		// then either left or right, then one step back.
 		
-		Set<Direction> orthogonal = getOrthogonalDirections(forward);
-		Direction back = getReturnDirection(forward);
+		Set<Direction> orthogonal = World.getOrthogonalDirections(forward);
+		Direction back = World.getReturnDirection(forward);
 		
 		Square inFront = neighbours.get(forward);
 		
@@ -127,40 +127,14 @@ public class Square {
 		for ( Direction d: neighbours.keySet() ) {
 			
 			Square neighbour = neighbours.get(d);
-			neighbour.clearNeighbour(getReturnDirection(d));
-			neighbours.remove(d);
+			neighbour.clearNeighbour(World.getReturnDirection(d));
+			clearNeighbour(d);
 		}
 	}
 	
 	public void clearNeighbour(Direction d) {
 		
-	//	System.out.println("clear " + this + "  " + d);
 		neighbours.remove(d);
-	//	System.out.println("cleared " + this + "  " + d);
-	}
-	
-	public Direction getReturnDirection(Direction direction) {
-		
-		int step = compassMap.get(direction);
-		int returnDirection = (step + 2) % 4;
-		return compass[returnDirection];
-	}
-	
-	
-	public Set<Direction> getOrthogonalDirections(Direction direction) {
-		
-		Set<Direction> retval = new HashSet<Direction>();
-		
-		int a = (compassMap.get(direction) + 1) % 4;
-		int b = (compassMap.get(direction) + 3) % 4;
+	}	
 
-		retval.add(compass[a]); retval.add(compass[b]);
-		return retval;
-	}
-
-	
-	public int convertDirection(Direction direction) {
-		
-		return compassMap.get(direction);
-	}
 }

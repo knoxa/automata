@@ -1,15 +1,17 @@
 package cells;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class World {
 
 	private static final Direction[] compass = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
 	
-	Map<Direction, Integer> compassMap; 
+	private static Map<Direction, Integer> compassMap; 
 
-	public World() {
+	static {
 		
 		compassMap = new HashMap<Direction, Integer>();
 		compassMap.put(Direction.NORTH, 0);
@@ -18,11 +20,23 @@ public class World {
 		compassMap.put(Direction.WEST, 3);
 	}
 
-	public Direction getReturnDirection(Direction direction) {
+	public static Direction getReturnDirection(Direction direction) {
 		
 		int step = compassMap.get(direction);
 		int returnDirection = (step + 2) % 4;
 		return compass[returnDirection];
+	}
+
+	
+	public static Set<Direction> getOrthogonalDirections(Direction direction) {
+		
+		Set<Direction> retval = new HashSet<Direction>();
+		
+		int a = (compassMap.get(direction) + 1) % 4;
+		int b = (compassMap.get(direction) + 3) % 4;
+
+		retval.add(compass[a]); retval.add(compass[b]);
+		return retval;
 	}
 
 }
