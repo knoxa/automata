@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Set;
 
 import orient.State;
+import worlds.Compass;
 import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
-import cells.Compass;
 
-public class Partitions {
+public class Partitioner {
 
 	public static Map<Integer, Set<Square>> partition(Set<Square> squares) {
 		
@@ -38,7 +38,7 @@ public class Partitions {
 	}
 	
 	
-	public static void extendPartition(Square square, Set<Square> partition) {
+	private static void extendPartition(Square square, Set<Square> partition) {
 		
 		if ( square.neighbourCount() == 0 ) {
 			//System.out.println("NO NEIGHBOURS");
