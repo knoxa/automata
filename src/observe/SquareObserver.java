@@ -3,10 +3,10 @@ package observe;
 import java.util.HashSet;
 import java.util.Set;
 
-import cells.Compass;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
+import worlds.Compass;
 
 public class SquareObserver {
 

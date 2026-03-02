@@ -1,13 +1,10 @@
 package act;
 
-import java.util.Map;
 import java.util.Set;
 
-import cells.Direction;
 import cells.Sense;
 import cells.Square;
-import observe.SquareObserver;
-import cells.Compass;
+import tiles.Tile;
 
 public class Action {
 
@@ -54,79 +51,6 @@ public class Action {
 		return new String(actor + " (" + act + ") " + sense);
 	}
 
-	public static void attach(Square from, Direction step, Square to) {
-		
-		from.setNeighbour(step, to);
-		Direction returnDirection = Compass.getReturnDirection(step);
-		to.setNeighbour(returnDirection, from);
-		
-		// also link "from" to adjacent squares that are diagonal to "to"
-
-		//System.out.println( from + " from.. " + from.diagonal()); 
-		
-		SquareObserver s;
-		
-		for ( Sense diagonal: SquareObserver.diagonal(from, step) ) {
-			
-			//System.out.println(" ... " + from + " - " + diagonal.direction + ", " + diagonal.square);
-			//System.out.println("   diagonal - " + from + "; " + diagonal.square );
-
-			if ( from.getNeighbour(diagonal.getDirection()) == null ) {
-				
-				from.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = Compass.getReturnDirection(diagonal.getDirection());
-				diagonal.getSquare().setNeighbour(returnDirection, from);
-			}
-		}
-
-		for ( Sense diagonal: SquareObserver.diagonal(to, returnDirection) ) {
-			
-			System.out.println(" ... " + to + " - " + diagonal.getDirection() + ", " + diagonal.getSquare());
-			System.out.println("   diagonal - " + to + "; " + diagonal.getSquare() );
-
-			if ( to.getNeighbour(diagonal.getDirection()) == null ) {
-				
-				to.setNeighbour(diagonal.getDirection(), diagonal.getSquare());
-				returnDirection = Compass.getReturnDirection(diagonal.getDirection());
-				diagonal.getSquare().setNeighbour(returnDirection, to);
-			}
-		}
-	}
-	
-	public static void detach(Square from, Direction step, Square to) {
-		
-		from.clearNeighbour(step);
-		to.clearNeighbour(Compass.getReturnDirection(step));
-	}
-	
-	public static void detach(Square square) {
-		
-		clearNeighbours(square);
-	}
-	
-	public static void capture(Square from, Direction step, Square to) {
-		
-		detach(to);
-		attach(from, step, to);
-	}
-	
-	public static void defect(Square from, Direction step, Square to) {
-		
-		detach(from);
-		attach(from, step, to);
-	}
-	
-	private static void clearNeighbours(Square square) {
-		
-		Map<Direction, Square> neighbours = square.getNeighbourMap();
-		
-		for ( Direction direction: neighbours.keySet() ) {
-			
-			square.clearNeighbour(direction);
-			neighbours.get(direction).clearNeighbour(Compass.getReturnDirection(direction));
-		}
-	}
-
 	public static void makeMoves(Set<Action> options) {
 		
 		for ( Action action: options ) {
@@ -136,19 +60,19 @@ public class Action {
 			switch (action.act) {
 			
 			case ATTACH:
-				Action.attach(action.actor, action.sense.getDirection(), action.sense.getSquare());
+				Tile.attach(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
 			case DETACH:
-				Action.detach(action.actor);
+				Tile.detach(action.actor);
 				break;
 				
 			case CAPTURE:
-				Action.capture(action.actor, action.sense.getDirection(), action.sense.getSquare());
+				Tile.capture(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
 			case DEFECT:
-				Action.defect(action.actor, action.sense.getDirection(), action.sense.getSquare());
+				Tile.defect(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 			}
 		}	
