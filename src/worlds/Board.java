@@ -70,7 +70,10 @@ public class Board {
 		
 		ch.startDocument();
 		
-		ch.startElement("", "board", "board", new AttributesImpl());
+		AttributesImpl attr = new AttributesImpl();
+		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(height));
+		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(width));
+		ch.startElement("", "board", "board", attr);
 		
 		for ( int h = 0; h < height; h++ ) {
 			
@@ -80,7 +83,7 @@ public class Board {
 				int partNo = reverse.get(square).iterator().next();
 				Set<Square> tile = partitionMap.get(partNo);
 
-				AttributesImpl attr = new AttributesImpl();
+				attr = new AttributesImpl();
 				attr.addAttribute("", "row", " row",  "Integer",  String.valueOf(h));
 				attr.addAttribute("", "col",  "col",  "Integer",  String.valueOf(w));
 				attr.addAttribute("", "tile", "tile", "Integer",  String.valueOf(partNo));
