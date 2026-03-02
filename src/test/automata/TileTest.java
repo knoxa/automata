@@ -105,14 +105,6 @@ public class TileTest {
 		assertEquals(3,partitionMapA.get(1).size());
 		assertEquals(1,partitionMapB.keySet().size());
 		assertEquals(2,partitionMapB.get(1).size());
-
-	//	Tile.attach(square2, Direction.NORTH, square3);
-
-		System.out.println(square1);
-		System.out.println(square2);
-		System.out.println(square3);
-		System.out.println(square4);
-		System.out.println(square5);
 	}
 	
 }

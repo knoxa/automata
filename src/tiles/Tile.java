@@ -26,15 +26,24 @@ public class Tile {
 		
 		// return the area of the smallest rectangle that covers the tile
 		
-		int height = 0;
-		int width  = 0;
-	
-		for ( Square s: tile ) {
-			
-			if ( !s.hasNeighbour(Direction.EAST ) )  height++;
-			if ( !s.hasNeighbour(Direction.NORTH ) ) width++;
-		}
+		Map<Square, Integer[]> coordinates = new HashMap<Square, Integer[]>();		
+		Map<Integer, Map<Integer, Set<Square>>> positions = new HashMap<>();
+
+		position(tile.iterator().next(), 0, 0, coordinates, positions);
+
+		int xMin = Integer.MAX_VALUE, yMin = Integer.MAX_VALUE, xMax = Integer.MIN_VALUE, yMax = Integer.MIN_VALUE;
 		
+		for ( Square square: coordinates.keySet() ) {
+			
+			Integer[] coords = coordinates.get(square);			
+			xMin = coords[0] < xMin ? coords[0] : xMin;
+			xMax = coords[0] > xMax ? coords[0] : xMax;
+			yMin = coords[1] < yMin ? coords[1] : yMin;
+			yMax = coords[1] > yMax ? coords[1] : yMax;
+		}
+
+		int height = yMax - yMin + 1;
+		int width  = xMax - xMin + 1;
 		return width * height;
 	}
 

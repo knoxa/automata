@@ -13,7 +13,7 @@ public class Pentomino {
 		
 		Map<Integer, Integer> counts = Tile.countNeighbours(tile);
 		int straightThree = Tile.straightThree(tile);
-		int area = tiles.Tile.area(tile);
+		int area = Tile.area(tile);
 		
 		if ( counts.get(4) > 0 ) {
 			
