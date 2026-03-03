@@ -11,7 +11,7 @@ public class Action {
 	Square actor;
 	Sense sense;
 	Act act;
-	double probability = 0.5;
+	double probability = 1.0;
 	
 	
 	public Square getActor() {
