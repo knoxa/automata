@@ -1,8 +1,10 @@
 package tiles;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import cakes.category.Maps;
 import cells.Square;
 
 public class Pentomino {
@@ -69,5 +71,39 @@ public class Pentomino {
 		}
 		
 		return retval;
+	}
+
+	public static boolean haveOnlyPentominoes(Map<Integer, Set<Square>> partitionMap) {
+		
+		boolean haveTwelve = true;
+		
+		for ( Integer partition: partitionMap.keySet() ) {
+			
+			if ( partitionMap.get(partition).size() != 5 ) {
+				
+				haveTwelve = false;
+				break;
+			}
+		}
+		
+		return haveTwelve;
+	}
+
+	public static Map<PentominoType, Set<Integer>> getPentominoes(Map<Integer, Set<Square>> partitionMap) {
+		
+		Map<PentominoType, Set<Integer>> pentominoMap = new HashMap<PentominoType, Set<Integer>>();
+		
+		for ( Integer partition: partitionMap.keySet() ) {
+			
+			Set<Square> tile = partitionMap.get(partition);
+			
+			if ( tile.size() == 5 ) {
+				
+				PentominoType p = identifyPentomino(tile);
+				Maps.addMapValue(pentominoMap, p, partition);
+			}
+		}
+		
+		return pentominoMap;
 	}
 }
