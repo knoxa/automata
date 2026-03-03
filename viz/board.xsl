@@ -24,6 +24,10 @@ path {
 	stroke:lightgrey; stroke-width:2;
 }
 
+g {
+	fill:lightgrey;
+}
+
 </style>
 
 
@@ -41,24 +45,24 @@ path {
 	
 	<g transform="translate({$x},{$y})" class="{@pentomino}">
 		<xsl:apply-templates select="*"/>
-		<circle r="10"/>
+		<circle r="15"/>
 	</g>
 </xsl:template>
 
 <xsl:template match="NORTH">
-	<path d="M0,0 v-40"/>
+	<path d="M0,0 v-35"/>
 </xsl:template>
 
 <xsl:template match="SOUTH">
-	<path d="M0,0 v40"/>
+	<path d="M0,0 v35"/>
 </xsl:template>
 
 <xsl:template match="EAST">
-	<path d="M0,0 h40"/>
+	<path d="M0,0 h35"/>
 </xsl:template>
 
 <xsl:template match="WEST">
-	<path d="M0,0 h-40"/>
+	<path d="M0,0 h-35"/>
 </xsl:template>
 
 </xsl:stylesheet>
