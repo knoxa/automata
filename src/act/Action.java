@@ -48,7 +48,7 @@ public class Action {
 
 	@Override
 	public String toString() {
-		return new String(actor + " (" + act + ") " + sense);
+		return new String(actor + " (" + act + ") " + sense + " [" + probability + "]");
 	}
 
 	public static void makeMoves(Set<Action> options) {
