@@ -17,7 +17,7 @@ public class Tile {
 	public static boolean isDetachable(Square square, Direction direction) {
 		
 		// Can the square be removed from a tile without disconnecting the squares left behind?		
-		return square.neighbourCount() == 1 || SquareObserver.diagonal(square, direction).size() > 0 ? true : false;
+		return square.neighbourCount() == 1 || (square.neighbourCount() == 2 && SquareObserver.diagonal(square, direction).size() > 0) ? true : false;
 	}
 
 	
