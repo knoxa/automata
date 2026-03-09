@@ -1,20 +1,9 @@
 package worlds;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
-import cakes.category.Maps;
-import cells.Direction;
 import cells.Square;
-import graph.GraphUtils;
-import orient.Partitioner;
-import tiles.Pentomino;
-import tiles.PentominoType;
 
 public class Board {
 
