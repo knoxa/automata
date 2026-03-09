@@ -9,6 +9,7 @@
 	<target name="board">
 		<!--
 		<xslt in="../experiments/board-solution1.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
 		-->
 		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
 	</target>

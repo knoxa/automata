@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  xmlns="http://www.w3.org/2000/svg" version="1.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/2000/svg" version="1.0">
 
 <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
 <xsl:template match="/">
-<svg viewBox="0 0 1200 800" preserveAspectRatio="none">
+<svg viewBox="0 0 1200 800" preserveAspectRatio="xMinYMin meet">
 
 <style type="text/css">
 
@@ -18,10 +18,11 @@
 .W { fill:steelblue; }
 .L { fill:limegreen; }
 .X { fill:red; }
-.U { fill:salmon; }
+.U { fill:teal; }
+.Z { fill:plum; }
 
 path {
-	stroke:lightgrey; stroke-width:2;
+	stroke:lightgrey; stroke-width:6;
 }
 
 g {
@@ -45,24 +46,24 @@ g {
 	
 	<g transform="translate({$x},{$y})" class="{@pentomino}">
 		<xsl:apply-templates select="*"/>
-		<circle r="15"/>
+		<rect x="-20" y="-20" width="40" height="40"/>
 	</g>
 </xsl:template>
 
 <xsl:template match="NORTH">
-	<path d="M0,0 v-35"/>
+	<path d="M-5,0 v-30"/>
 </xsl:template>
 
 <xsl:template match="SOUTH">
-	<path d="M0,0 v35"/>
+	<path d="M5,0 v30"/>
 </xsl:template>
 
 <xsl:template match="EAST">
-	<path d="M0,0 h35"/>
+	<path d="M0,-5 h30"/>
 </xsl:template>
 
 <xsl:template match="WEST">
-	<path d="M0,0 h-35"/>
+	<path d="M0,5 h-30"/>
 </xsl:template>
 
 </xsl:stylesheet>
