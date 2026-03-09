@@ -6,18 +6,16 @@ import java.util.Map;
 import java.util.Set;
 
 import cakes.category.Maps;
-import cells.Direction;
 import cells.Sense;
 import cells.Square;
 import worlds.Board;
+import worlds.Compass;
 
 public class BoardObserver {
 
 	public static Map<Square, Set<Sense>> lookAbout(Board board) {
 		
 		// create a map of squares pointing to neighbours they can "see".
-		
-		final Direction[] compass = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
 		
 		Square[][] grid = board.getGrid();
 		Map<Square, Set<Sense>> environment = new HashMap<Square, Set<Sense>>();
@@ -46,7 +44,7 @@ public class BoardObserver {
 					if (neighbourCol >= 0 && neighbourRow >= 0 && neighbourCol < boardWidth && neighbourRow < boardHeight ) {
 						
 						Square neighbour = grid[neighbourRow][neighbourCol];
-						Sense sense = new Sense(); sense.setSquare(neighbour); sense.setDirection(compass[step/2]);
+						Sense sense = new Sense(); sense.setSquare(neighbour); sense.setDirection(Compass.compass[step/2]);
 						sensed.add(sense);
 					}
 				}
