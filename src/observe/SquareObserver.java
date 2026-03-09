@@ -47,6 +47,7 @@ public class SquareObserver {
 		return retval;
 	}
 
+	
 	public static Map<Square, Set<Sense>> sense(Map<Square, Integer[]> coordinates, Map<Integer, Map<Integer, Set<Square>>> layout) {
 		
 		// The "coordinates" and "layout" maps encode tiles laid out in a grid. There are assumed to be two tiles.
@@ -55,10 +56,8 @@ public class SquareObserver {
 		// Return a map of observations made by each square in the first tile
 		Map<Square, Set<Sense>> observations = new HashMap<>();
 			
-		// Partion the located squares to make tiles
+		// Partition the located squares to make tiles
 		Map<Integer, Set<Square>> partitions = Partitioner.partition(coordinates.keySet());
-		//System.out.println("number of partitions is " + partitions.size());
-		
 		
 		// just work with the first tile (need to change this later?)
 		
@@ -67,11 +66,11 @@ public class SquareObserver {
 		for ( Square square: tile ) {
 			
 			// Each square "looks" in all neighbouring directions.
-			// If a square is seen, that isn't part of the same tile, then add a Sense object to "observatnios". 
+			// If a square is seen, that isn't part of the same tile, then add a Sense object to "observations". 
 			
 			Integer[] coords = coordinates.get(square);
 			
-			for (Direction direction: Compass.compass ) {
+			for ( Direction direction: Compass.compass ) {
 				
 				Map<Integer, Set<Square>> row = layout.get(coords[1] + Compass.getOffsetY(direction));
 				
@@ -84,8 +83,6 @@ public class SquareObserver {
 						for ( Square sensed: locatedSquares ) {
 							
 							if ( !tile.contains(sensed) ) {
-								
-								//System.out.println(square + " SEES " + locatedSquares + " in direction " + direction);
 								
 								Sense sense = new Sense(direction, sensed);
 								Maps.addMapValue(observations, square, sense);
