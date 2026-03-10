@@ -68,9 +68,8 @@ public class TileAction {
 		Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(partitionMap);
 		
 		Map<Square, Set<Integer>> partitionLookup = Maps.invertMap(partitionMap);
-		//Integer activePart = partitionLookup.get(active).iterator().next();
 		
-		// get smallest and largest tile sizes ..
+		// get smallest tile size
 		List<Integer> sizes = new ArrayList<Integer>();
 		sizes.addAll(sizeMap.keySet());
 		Collections.sort(sizes);		
