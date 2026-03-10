@@ -19,7 +19,7 @@
 .L { fill:limegreen; }
 .X { fill:red; }
 .U { fill:teal; }
-.Z { fill:plum; }
+.Z { fill:orange; }
 
 path {
 	stroke:lightgrey; stroke-width:6;

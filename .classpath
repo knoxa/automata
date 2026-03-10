@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Argumentation"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Cakes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="src" path="/XSLT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
