@@ -19,14 +19,7 @@ public class TileAction {
 	public static void dissolve(Square active) {
 		
 		Set<Action> moves = new HashSet<Action>();
-		
-		// starting with the active square ...
-		Set<Square> activeTile = new HashSet<Square>();
-		activeTile.add(active);
-		
-		// add all the squares in the same tile
-		Map<Integer, Set<Square>> activeMap = Partitioner.partition(activeTile);
-		activeTile.addAll(activeMap.get(1));
+		Set<Square> activeTile = Partitioner.getTileContaining(active);
 		
 		for ( Square square: activeTile ) {
 			

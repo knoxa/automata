@@ -95,4 +95,36 @@ public class SquareObserver {
 		
 		return observations;
 	}
+
+	
+	public static Map<Square, Set<Sense>> sense(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, Set<Integer> tiles) {
+		
+		// Find squares in 'tiles' that are adjacent to squares that aren't in the same tile.
+		// Return a map of observations made by each square of the supplied tiles.
+		
+		Map<Square, Set<Sense>> observations = new HashMap<Square, Set<Sense>>();
+
+		Map<Square, Set<Integer>> reverse = cakes.category.Maps.invertMap(partitionMap);
+		
+		for ( Integer tile: tiles ) {
+			
+			for ( Square square: partitionMap.get(tile) ) {
+				
+				Set<Sense> sensed = environment.get(square);
+				
+				for ( Sense sense: sensed ) {
+					
+					Integer neighbourPart = reverse.get(sense.getSquare()).iterator().next();
+					
+					if ( neighbourPart != tile && tiles.contains(neighbourPart) )  {
+						
+						Maps.addMapValue(observations, square, sense);
+					}
+				}
+			}
+		}
+						
+		return observations;
+	}
+
 }

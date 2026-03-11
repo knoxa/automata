@@ -1,6 +1,8 @@
 package test.automata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileOutputStream;
 import java.util.HashSet;
@@ -9,8 +11,12 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import cakes.category.Maps;
 import cells.Direction;
+import cells.Sense;
 import cells.Square;
+import observe.BoardObserver;
+import observe.SquareObserver;
 import orient.Partitioner;
 import tiles.Pentomino;
 import tiles.PentominoType;
@@ -107,8 +113,7 @@ class PentominoTest {
 		Tile.attach(grid[0][0], Direction.SOUTH, grid[1][0]);
 		Tile.attach(grid[0][1], Direction.SOUTH, grid[1][1]);
 		
-		Set<Square> tileA = new HashSet<Square>(); tileA.add(grid[0][0]);
-		tileA.addAll(Partitioner.partition(tileA).get(1));
+		Set<Square> tileA = Partitioner.getTileContaining(grid[0][0]);
 		PentominoType typeA = Pentomino.identifyPentomino(tileA);
 		assertEquals(PentominoType.P, typeA);
 
@@ -117,10 +122,37 @@ class PentominoTest {
 		Tile.attach(grid[2][2], Direction.EAST, grid[2][3]);
 		Tile.attach(grid[2][2], Direction.NORTH, grid[1][2]);
 
-		Set<Square> tileB = new HashSet<Square>(); tileB.add(grid[2][0]);
-		tileB.addAll(Partitioner.partition(tileB).get(1));
+		Set<Square> tileB = Partitioner.getTileContaining(grid[2][0]);
 		PentominoType typeB = Pentomino.identifyPentomino(tileB);
 		assertEquals(PentominoType.Y, typeB);
+		
+		Set<Integer> tiles = new HashSet<>();
+		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
+		Map<Square, Set<Integer>> reverse = Maps.invertMap(partitionMap);
+		tiles.addAll(reverse.get(grid[0][0])); tiles.addAll(reverse.get(grid[2][0]));
+		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, BoardObserver.lookAbout(board), tiles);	
+		// 6 square are in contact
+		assertEquals(6, contacts.keySet().size());
+		// square at 0,0 is not in contact
+		assertNull(contacts.get(grid[0][0]));	
+		// square at 1,0 is in contact with 1 square
+		assertEquals(1, contacts.get(grid[1][0]).size());
+		// square at 1,1 is in contact with 2 squares
+		assertEquals(2, contacts.get(grid[1][1]).size());
+		
+		Set<Direction> directions = new HashSet<>();
+		Set<Square> squares = new HashSet<>();
+		
+		for ( Sense sense: contacts.get(grid[1][1]) ) {
+			
+			squares.add(sense.getSquare());
+			directions.add(sense.getDirection());
+		}
+		
+		assertTrue( directions.contains(Direction.EAST) );
+		assertTrue( directions.contains(Direction.SOUTH) );
+		assertTrue( squares.contains(grid[1][2]) );
+		assertTrue( squares.contains(grid[2][1]) );
 
 		Pipeline p = new Pipeline();
 		

@@ -39,6 +39,16 @@ public class Partitioner {
 	}
 	
 	
+	public static Set<Square> getTileContaining(Square square) {
+		
+		Set<Square> tile = new HashSet<Square>();
+		tile.add(square);
+		Map<Integer, Set<Square>> partitions = partition(tile);
+		tile.addAll(partitions.get(1));
+		return tile;
+	}
+	
+	
 	private static void extendPartition(Square square, Set<Square> partition) {
 		
 		if ( square.neighbourCount() == 0 )  return;
