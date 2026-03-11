@@ -24,15 +24,14 @@ and each square links to all its neighbours if laid out on a grid.
 The operations that enforce these rules act on a source and target squares:
 
 * **ATTACH**: Link source to target and target to source. If the target is part of a tile, then other squares in the two tiles are linked if they touch.
-This operation fails if it would cause squares to overlap.
+This operation fails if it would cause tiles to overlap.
 * **DETACH**: Remove a square from a tile by clearing all of its neighbours.
 * **CAPTURE**: This is equivalent to DETACH from target followed by ATTACH to source.
 * **DEFECT**: This is equivalent to DETACH from source followed by ATTACH to target.
 
 ## Pentominoes
 
-I can fill a board (that has an area which is a multiple of 5) with squares and get them to self-organize into pentominoes as follows:
-
+I can fill a board, that has an area which is a multiple of 5, with squares and get them to self-organize into [pentominoes](https://en.wikipedia.org/wiki/Pentomino).
 At each step, partition the board into tiles. Initially, all the tiles will be of size 1.
 While there are no tiles of size 6 or more, select one of the tiles of smallest size.
 Find the neighbouring tiles that touch this tile. Have a square defect from the selected tile to a smallest neighbour.

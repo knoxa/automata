@@ -22,7 +22,7 @@
 .Z { fill:orange; }
 
 path {
-	stroke:lightgrey; stroke-width:6;
+	stroke:lightgrey; stroke-width:8;
 }
 
 g {
