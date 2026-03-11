@@ -1,6 +1,7 @@
 package test.automata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -140,6 +141,7 @@ class PentominoTest {
 		// square at 1,1 is in contact with 2 squares
 		assertEquals(2, contacts.get(grid[1][1]).size());
 		
+		// square at 1,1 sees squares 1,2 and 2,1 EAST and SOUTH
 		Set<Direction> directions = new HashSet<>();
 		Set<Square> squares = new HashSet<>();
 		
@@ -154,6 +156,10 @@ class PentominoTest {
 		assertTrue( squares.contains(grid[1][2]) );
 		assertTrue( squares.contains(grid[2][1]) );
 
+		// square at 2,0 is detachable, square at 2,1 isn't
+		assertTrue(Tile.isDetachable(grid[2][0]));
+		assertFalse(Tile.isDetachable(grid[2][1]));
+		
 		Pipeline p = new Pipeline();
 		
 		try {

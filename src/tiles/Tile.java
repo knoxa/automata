@@ -14,10 +14,23 @@ import worlds.Compass;
 
 public class Tile {
 
-	public static boolean isDetachable(Square square, Direction direction) {
+	public static boolean isDetachable(Square square) {
 		
-		// Can the square be removed from a tile without disconnecting the squares left behind?		
-		return square.neighbourCount() == 1 || (square.neighbourCount() == 2 && SquareObserver.diagonal(square, direction).size() > 0) ? true : false;
+		// Can the square be removed from a tile without disconnecting the squares left behind?
+		
+		if ( square.neighbourCount() == 1 ) return true;
+		
+		else if ( square.neighbourCount() == 2 ) {
+			
+			for ( Square neighbour: square.getNeighbours() ) {
+				
+				if ( neighbour.neighbourCount() == 1 ) return false;
+			}
+			
+			return true;
+		}
+		
+		return false;
 	}
 
 	

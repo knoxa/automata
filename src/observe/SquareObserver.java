@@ -37,7 +37,7 @@ public class SquareObserver {
 					// found a square to report ...
 					
 					Sense sense = new Sense();
-					sense.setDirection(leftOrRight);;
+					sense.setDirection(leftOrRight);
 					sense.setSquare(corner.getNeighbour(back));
 					retval.add(sense);
 				}
