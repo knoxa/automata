@@ -1,6 +1,6 @@
 package act;
 
-import java.util.Set;
+import java.util.Collection;
 
 import cells.Sense;
 import cells.Square;
@@ -51,7 +51,7 @@ public class Action {
 		return new String(actor + " (" + act + ") " + sense + " [" + probability + "]");
 	}
 
-	public static void makeMoves(Set<Action> options) {
+	public static void makeMoves(Collection<Action> options) {
 		
 		for ( Action action: options ) {
 			
@@ -64,7 +64,9 @@ public class Action {
 				break;
 				
 			case DETACH:
-				Tile.detach(action.actor);
+				
+				if (action.sense.getSquare() == null)  Tile.detach(action.actor);
+				else Tile.detach(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
 			case CAPTURE:
