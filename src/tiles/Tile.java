@@ -2,6 +2,7 @@ package tiles;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,12 +25,19 @@ public class Tile {
 		
 		else if ( square.neighbourCount() == 2 ) {
 			
-			for ( Square neighbour: square.getNeighbours() ) {
-				
-				if ( neighbour.neighbourCount() == 1 ) return false;
-			}
+			// the square is detachable if the two connecting squares share a neighbour that isn't this square
 			
-			return true;
+			Set<Square> neighbours = square.getNeighbours();
+			Iterator<Square> iter = neighbours.iterator();
+			Square a = iter.next(); Square b = iter.next();
+			
+			Set<Square> commonNeighbours = new HashSet<>();
+			commonNeighbours.addAll(a.getNeighbours());
+			commonNeighbours.retainAll(b.getNeighbours());
+			
+			// size should be either 1 or 2. It will be two if there is a square, diagonal to this one,
+			// connected to both its neighbours - which makes this square detachable
+			if ( commonNeighbours.size() > 1 ) return true;
 		}
 		
 		return false;
