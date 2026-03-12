@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
+import act.Action;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
@@ -102,7 +103,7 @@ public class TileTest {
 		// split off square4,square 5 as a 2-tile
 		Set<Square> fragment = new HashSet<Square>();
 		fragment.add(square4); fragment.add(square5);		
-		Tile.detachTile(fragment);
+		Action.makeMoves(Tile.detachTileActions(fragment));
 		
 		Set<Square> setX = new HashSet<Square>();
 		setX.add(square1); // one of the three left behind

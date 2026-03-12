@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import act.Act;
+import act.Action;
 import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
@@ -120,8 +122,12 @@ public class Tile {
 	}
 
 
-	public static void detachTile(Set<Square> squares) {
+	public static Set<Action> detachTileActions(Set<Square> squares) {
 		
+		// get the actions needed to detach any squares in the given set from squares that aren't in that set
+		
+		Set<Action> actions = new HashSet<>();
+
 		Map<Square, Set<Sense>> observations = new HashMap<>();
 		
 		for ( Square square: squares ) {
@@ -145,9 +151,14 @@ public class Tile {
 			
 			for ( Sense sense: observations.get(square) ) {
 				
-				detach(square, sense.getDirection(), sense.getSquare());
+				Action action = new Action();
+				action.setAct(Act.DETACH);
+				action.setActor(square); action.setSense(sense);
+				actions.add(action);
 			}
 		}
+		
+		return actions;
 	}
 
 
