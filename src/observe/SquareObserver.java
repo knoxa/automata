@@ -127,4 +127,52 @@ public class SquareObserver {
 		return observations;
 	}
 
+	
+	public static Map<Square, Set<Square>> getSensedSquaresBySquare(Map<Square, Set<Sense>> contacts) {
+		
+		// take a map of observations keyed by squares and create a map where the key is the same but
+		// the values are the sense squares.
+		
+		Map<Square, Set<Square>> sensedSquares = new HashMap<>();	
+		
+		for ( Square square: contacts.keySet() )  {
+			
+			Set<Square> squares = new HashSet<Square>();
+			for ( Sense sense: contacts.get(square) )  squares.add(sense.getSquare());
+			sensedSquares.put(square, squares);
+		}
+		
+		return sensedSquares;
+	}
+
+	
+	public static Map<Integer, Set<Square>> getSensedSquaresByTile(Map<Square, Set<Sense>> contacts, Map<Integer, Set<Square>> partitionMap) {
+		
+		// Take a map of observations keyed by squares and a map of squares partitioned into tiles.
+		// Create a map where the key is the tile number and the value is the set of squares contactable from that tile. 
+		
+		Map<Integer, Set<Square>> sensedSquares = new HashMap<>();	
+		
+		for ( Integer partNo: partitionMap.keySet() ) {
+			
+			Set<Square> squares = new HashSet<Square>();
+
+			for ( Square square: partitionMap.get(partNo) )  {
+				
+				Set<Sense> seen = contacts.get(square);
+				
+				if ( seen != null ) {
+					
+					for ( Sense sense: seen )  {
+						squares.add(sense.getSquare());
+					}
+				}
+			}
+			
+			sensedSquares.put(partNo, squares);
+		}
+		
+		return sensedSquares;
+	}
+
 }
