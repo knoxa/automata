@@ -109,6 +109,7 @@ class PentominoTest {
 		Board board = new Board(4,3);	
 		Square[][] grid = board.getGrid();
 		
+		// a P tile
 		Tile.attach(grid[0][0], Direction.EAST, grid[0][1]);
 		Tile.attach(grid[0][1], Direction.EAST, grid[0][2]);
 		Tile.attach(grid[0][0], Direction.SOUTH, grid[1][0]);
@@ -118,6 +119,7 @@ class PentominoTest {
 		PentominoType typeA = Pentomino.identifyPentomino(tileA);
 		assertEquals(PentominoType.P, typeA);
 
+		// a Y tile
 		Tile.attach(grid[2][0], Direction.EAST, grid[2][1]);
 		Tile.attach(grid[2][1], Direction.EAST, grid[2][2]);
 		Tile.attach(grid[2][2], Direction.EAST, grid[2][3]);
@@ -159,6 +161,47 @@ class PentominoTest {
 		// square at 2,0 is detachable, square at 2,1 isn't
 		assertTrue(Tile.isDetachable(grid[2][0]));
 		assertFalse(Tile.isDetachable(grid[2][1]));
+		
+		// square at 0,0 is detachable
+		assertTrue(Tile.isDetachable(grid[0][0]));
+		
+		// there are 4 detachable squares in the P tile and 3 in the Y tile
+		Map<Integer, Set<Square>> detachableSquares = Pentomino.getDetachableSquares(partitionMap);
+		assertEquals(4, detachableSquares.get(1).size());
+		assertEquals(3, detachableSquares.get(2).size());
+		
+		Map<Square, Set<Square>> squareContacts = SquareObserver.getSensedSquaresBySquare(contacts);
+		// square at 1,0 is in contact with 1 square (at 2,0)
+		assertEquals(1, squareContacts.get(grid[1][0]).size());
+		assertEquals(grid[2][0], squareContacts.get(grid[1][0]).iterator().next());
+		// square at 1,1 is in contact with 2 squares (at 2,1 and 1,2)
+		assertEquals(2, squareContacts.get(grid[1][1]).size());
+		
+		Map<Integer, Set<Square>> tileContacts = SquareObserver.getSensedSquaresByTile(contacts, partitionMap);
+		// the P tile sees 3 squares of the Y tile
+		assertEquals(3, tileContacts.get(1).size());
+		assertTrue(tileContacts.get(1).contains(grid[2][0]));
+		assertTrue(tileContacts.get(1).contains(grid[2][1]));
+		assertTrue(tileContacts.get(1).contains(grid[1][2]));
+		// the Y tile sees 3 squares of the P tile
+		assertEquals(3, tileContacts.get(2).size());
+		assertTrue(tileContacts.get(2).contains(grid[1][0]));
+		assertTrue(tileContacts.get(2).contains(grid[1][1]));
+		assertTrue(tileContacts.get(2).contains(grid[0][2]));
+
+		Set<Square> contacts1 = tileContacts.get(1);
+		// restrict to contacts in tile2
+		contacts1.retainAll(partitionMap.get(2));
+		// should still be 3 contacts
+		assertEquals(3, contacts1.size());
+		
+		Map<Integer, Set<Set<Square>>> tileFragments = Pentomino.getDetachableFragments(contacts);
+		// there are 6 detachable fragments in the P tile (square at 0,0 is detachable - but not a fragment because it has no contacts)
+		assertEquals(6, tileFragments.get(1).size());
+		assertTrue(Tile.isDetachable(grid[0][0]));
+		// there are 3 detachable fragments in the Y tile (square at 3,2 is detachable - but not a fragment because it has no contacts)
+		assertEquals(3, tileFragments.get(2).size());
+		assertTrue(Tile.isDetachable(grid[2][3]));
 		
 		Pipeline p = new Pipeline();
 		
