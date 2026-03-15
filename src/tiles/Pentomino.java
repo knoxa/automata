@@ -3,6 +3,7 @@ package tiles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -155,6 +156,96 @@ public class Pentomino {
 		
 		
 		return moves;
+	}
+
+	
+	public static Map<Integer, Set<Set<Square>>> getDetachableFragments(Map<Square, Set<Sense>> contacts) {
+		
+		// Get tile fragments that be detached from a pentomino, leaving the remainder of the tile connected.
+		// Fragments are filtered so that only those containing a square in 'contacts' are returned.
+		
+		Map<Integer, Set<Set<Square>>> tileFragments = new HashMap<>();
+
+		// partition the tiles that are in contact		
+		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(contacts.keySet());		
+
+		for ( Integer partNo: partitionMap.keySet() ) {
+			
+			Set<Set<Square>> fragments = new HashSet<>();
+			
+			for ( Square square: partitionMap.get(partNo) ) {
+				
+				if ( Tile.isDetachable(square) ) {
+					
+					// the single square is a detacable fragment in its own right
+					Set<Square> fragment = new HashSet<>();
+					fragment.add(square);
+					
+					// ... but may also be part of a larger fragment
+					for ( Square neighbour: square.getNeighbours() ) {
+						
+						if ( neighbour.neighbourCount() <= 2 ) {
+							
+							fragment.add(neighbour);
+						}
+						else if ( neighbour.neighbourCount() == 3 )  {
+							
+							// check for P tile - can only disconnect the square with 3 neighbours if it is in a fragment
+							// with the square that has 1 neighbour
+							Set<Square> nextNeighbours = neighbour.getNeighbours();
+							nextNeighbours.remove(square);
+							
+							boolean wanted = true;
+							
+							for ( Square sq: nextNeighbours )  if ( sq.neighbourCount() != 2 )  wanted = false;						
+							if ( wanted )  fragment.add(neighbour);
+						}
+					}
+					
+					// ignore fragments that don't have a square in the set of contacts
+					Set<Square> pointsOfContact = new HashSet<>();
+					pointsOfContact.addAll(fragment);
+					pointsOfContact.retainAll(contacts.keySet());
+					
+					// store the fragment. Don't need fragments of size 3 because we'll get the corresponding size 2 fragment anyway
+					if ( !pointsOfContact.isEmpty() && fragment.size() < 3 ) {
+						
+						fragments.add(fragment);
+					}
+					
+					if ( fragment.size() > 1 && contacts.keySet().contains(square) ) {
+						
+						// Add a set containing just the detachable tile 
+						Set<Square> singleton = new HashSet<>();
+						singleton.add(square);
+						fragments.add(singleton);						
+					}
+				}
+				
+				tileFragments.put(partNo, fragments);
+			}
+		}
+		
+		return tileFragments;
+	}
+
+	
+	public static Map<Integer, Set<Square>> getDetachableSquares(Map<Integer, Set<Square>> partitionMap) {
+		
+		Map<Integer, Set<Square>> detachableSquares = new HashMap<>();
+
+		for ( Integer partNo: partitionMap.keySet() ) {
+			
+			for ( Square square: partitionMap.get(partNo) ) {
+				
+				if ( Tile.isDetachable(square) ) {
+					
+					Maps.addMapValue(detachableSquares, partNo, square);
+				}
+			}
+		}
+		
+		return detachableSquares;
 	}
 
 }
