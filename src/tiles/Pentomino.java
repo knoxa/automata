@@ -1,13 +1,23 @@
 package tiles;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import act.TileAction;
 import cakes.category.Maps;
+import cells.Sense;
 import cells.Square;
+import orient.Chooser;
+import orient.Partitioner;
+import worlds.Board;
 
 public class Pentomino {
+	
+	private static final int MAX_ITERATIONS = 2000;
 
 	public static PentominoType identifyPentomino(Set<Square> tile) {
 		
@@ -106,4 +116,45 @@ public class Pentomino {
 		
 		return pentominoMap;
 	}
+	
+	
+	public static int formPentominoes(Board board, Chooser chooser, Map<Square, Set<Sense>> environment) {
+		
+		int moves = 0;
+		
+		for ( int i = 0; i < MAX_ITERATIONS; i++ ) {
+			
+			// partition the board into tiles and get the tile sizes
+			Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
+			Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(partitionMap);
+
+			// finished if we only have pentominoes
+			if ( Pentomino.haveOnlyPentominoes(partitionMap) )  break;
+			
+			// otherwise, find the largest tile size
+			List<Integer> sizes = new ArrayList<Integer>();
+			sizes.addAll(sizeMap.keySet());
+			Collections.sort(sizes);		
+			int largestSize = sizes.get(sizes.size()-1);
+			
+			if ( largestSize > 5 ) {
+				
+				// dissolve one of the largest size tiles
+				Square next = chooser.randomFromLargestPartion(partitionMap, sizeMap, sizes);
+				TileAction.dissolve(next);
+			}
+			else {
+				
+				// a square from one of the smallest tiles defects (to its smallest neighbour)
+				Integer p = chooser.randomSmallestPartion(sizeMap, sizes);
+				TileAction.oneSquareDefects(partitionMap.get(p), environment, chooser);
+			}
+
+			moves++;
+		}
+		
+		
+		return moves;
+	}
+
 }
