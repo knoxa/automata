@@ -75,18 +75,18 @@ public class Pentomino {
 
 	public static boolean haveOnlyPentominoes(Map<Integer, Set<Square>> partitionMap) {
 		
-		boolean haveTwelve = true;
+		boolean haveOnlyPentominoes = true;
 		
 		for ( Integer partition: partitionMap.keySet() ) {
 			
 			if ( partitionMap.get(partition).size() != 5 ) {
 				
-				haveTwelve = false;
+				haveOnlyPentominoes = false;
 				break;
 			}
 		}
 		
-		return haveTwelve;
+		return haveOnlyPentominoes;
 	}
 
 	public static Map<PentominoType, Set<Integer>> getPentominoes(Map<Integer, Set<Square>> partitionMap) {
