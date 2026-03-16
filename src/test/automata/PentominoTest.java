@@ -166,7 +166,7 @@ class PentominoTest {
 		assertTrue(Tile.isDetachable(grid[0][0]));
 		
 		// there are 4 detachable squares in the P tile and 3 in the Y tile
-		Map<Integer, Set<Square>> detachableSquares = Pentomino.getDetachableSquares(partitionMap);
+		Map<Integer, Set<Square>> detachableSquares = Tile.getDetachableSquares(partitionMap);
 		assertEquals(4, detachableSquares.get(1).size());
 		assertEquals(3, detachableSquares.get(2).size());
 		
@@ -194,6 +194,21 @@ class PentominoTest {
 		contacts1.retainAll(partitionMap.get(2));
 		// should still be 3 contacts
 		assertEquals(3, contacts1.size());
+		Set<Square> contacts2 = tileContacts.get(2);
+		// restrict to contacts in tile1
+		contacts2.retainAll(partitionMap.get(1));
+		// should still be 3 contacts
+		assertEquals(3, contacts2.size());
+		
+		// only 1 of the squares in the P tile is in contact with more that one square in the Y tile
+		Set<Square> contacts1a = SquareObserver.moreThanOneContact(contacts1, squareContacts);
+		assertEquals(1, contacts1a.size());	
+		// only 1 of the squares in the Y tile is in contact with more that one square in the P tile
+		Set<Square> contacts2a = SquareObserver.moreThanOneContact(contacts2, squareContacts);
+		assertEquals(1, contacts2a.size());
+		// each of the squares "sees" the other
+		assertTrue(squareContacts.get(contacts1a.iterator().next()).containsAll(contacts2a));
+		assertTrue(squareContacts.get(contacts2a.iterator().next()).containsAll(contacts1a));
 		
 		Map<Integer, Set<Set<Square>>> tileFragments = Pentomino.getDetachableFragments(contacts);
 		// there are 6 detachable fragments in the P tile (square at 0,0 is detachable - but not a fragment because it has no contacts)
