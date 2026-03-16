@@ -174,5 +174,15 @@ public class SquareObserver {
 		
 		return sensedSquares;
 	}
+	
+	
+	public static Set<Square> moreThanOneContact(Set<Square> squares, Map<Square, Set<Square>> contacts) {
+		
+		// get the set of squares that are in contact with 2 or more squares in a neighbouring tile.
+		
+		Set<Square> results = new HashSet<>();	
+		for ( Square square: squares )   if ( contacts.get(square).size() > 1 ) results.add(square);
+		return results;
+	}
 
 }
