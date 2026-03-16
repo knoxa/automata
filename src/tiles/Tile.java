@@ -21,7 +21,7 @@ public class Tile {
 		
 		// Can the square be removed from a tile without disconnecting the squares left behind?
 		
-		if ( square.neighbourCount() == 1 ) return true;
+		if ( square.neighbourCount() <= 1 ) return true;
 		
 		else if ( square.neighbourCount() == 2 ) {
 			
@@ -273,6 +273,25 @@ public class Tile {
 		}
 		
 		return tileFits;
+	}
+
+
+	public static Map<Integer, Set<Square>> getDetachableSquares(Map<Integer, Set<Square>> partitionMap) {
+		
+		Map<Integer, Set<Square>> detachableSquares = new HashMap<>();
+	
+		for ( Integer partNo: partitionMap.keySet() ) {
+			
+			for ( Square square: partitionMap.get(partNo) ) {
+				
+				if ( isDetachable(square) ) {
+					
+					Maps.addMapValue(detachableSquares, partNo, square);
+				}
+			}
+		}
+		
+		return detachableSquares;
 	}
 
 }

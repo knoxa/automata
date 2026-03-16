@@ -148,8 +148,35 @@ public class Pentomino {
 				
 				// a square from one of the smallest tiles defects (to its smallest neighbour)
 				Integer p = chooser.randomSmallestPartion(sizeMap, sizes);
-				TileAction.oneSquareDefects(partitionMap.get(p), environment, chooser);
+				TileAction.anySquareDefects(partitionMap.get(p), environment, chooser);
 			}
+
+			moves++;
+		}
+		
+		
+		return moves;
+	}
+	
+	
+	public static int formPentominoes2(Board board, Chooser chooser, Map<Square, Set<Sense>> environment) {
+		
+		int moves = 0;
+		
+		for ( int i = 0; i < MAX_ITERATIONS; i++ ) {
+			
+			// partition the board into tiles and get the tile sizes
+			Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
+			Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(partitionMap);
+
+			// finished if we only have pentominoes
+			if ( Pentomino.haveOnlyPentominoes(partitionMap) )  break;
+			
+			List<Integer> sizes = new ArrayList<Integer>();
+			sizes.addAll(sizeMap.keySet());
+
+			Integer p = chooser.randomSmallestPartion(sizeMap, sizes);
+			TileAction.anySquareDefects(partitionMap.get(p), environment, chooser);
 
 			moves++;
 		}
@@ -227,25 +254,6 @@ public class Pentomino {
 		}
 		
 		return tileFragments;
-	}
-
-	
-	public static Map<Integer, Set<Square>> getDetachableSquares(Map<Integer, Set<Square>> partitionMap) {
-		
-		Map<Integer, Set<Square>> detachableSquares = new HashMap<>();
-
-		for ( Integer partNo: partitionMap.keySet() ) {
-			
-			for ( Square square: partitionMap.get(partNo) ) {
-				
-				if ( Tile.isDetachable(square) ) {
-					
-					Maps.addMapValue(detachableSquares, partNo, square);
-				}
-			}
-		}
-		
-		return detachableSquares;
 	}
 
 }
