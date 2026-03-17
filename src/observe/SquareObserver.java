@@ -184,5 +184,28 @@ public class SquareObserver {
 		for ( Square square: squares )   if ( contacts.get(square).size() > 1 ) results.add(square);
 		return results;
 	}
+	
+	
+	public static Map<Square, Set<Sense>> restrictEnvironment(Map<Square, Set<Sense>> environment, Set<Square> locality) {
+		
+		Map<Square, Set<Sense>> filtered = new HashMap<>();
+		
+		for ( Square square: environment.keySet() ) {
+			
+			if ( locality.contains(square) ) {
+				
+				Set<Sense> visible = new HashSet<Sense>();
+				
+				for ( Sense sense: environment.get(square) ) {
+					
+					if ( locality.contains(sense.getSquare()) )  visible.add(sense);
+				}
+				
+				filtered.put(square, visible);
+			}
+		}
+		
+		return filtered;
+	}
 
 }
