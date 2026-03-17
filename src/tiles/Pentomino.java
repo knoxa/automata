@@ -142,7 +142,8 @@ public class Pentomino {
 				
 				// dissolve one of the largest size tiles
 				Square next = chooser.randomFromLargestPartion(partitionMap, sizeMap, sizes);
-				TileAction.dissolve(next);
+				Set<Square> tile = Partitioner.getTileContaining(next);
+				TileAction.dissolveTile(tile);
 			}
 			else {
 				

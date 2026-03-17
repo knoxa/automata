@@ -282,13 +282,20 @@ public class Tile {
 	
 		for ( Integer partNo: partitionMap.keySet() ) {
 			
-			for ( Square square: partitionMap.get(partNo) ) {
-				
-				if ( isDetachable(square) ) {
-					
-					Maps.addMapValue(detachableSquares, partNo, square);
-				}
-			}
+			Maps.addMapValues(detachableSquares, partNo, getDetachableSquares(partitionMap.get(partNo)));
+		}
+		
+		return detachableSquares;
+	}
+
+
+	public static Set<Square> getDetachableSquares(Set<Square> squares) {
+		
+		Set<Square> detachableSquares = new HashSet<>();
+		
+		for ( Square square: squares ) {
+			
+			if ( isDetachable(square) )  detachableSquares.add(square);
 		}
 		
 		return detachableSquares;
