@@ -30,11 +30,3 @@ This operation fails if it would cause tiles to overlap.
 * **DEFECT**: This is equivalent to DETACH from source followed by ATTACH to target.
 
 ## Pentominoes
-
-I can fill a board, that has an area which is a multiple of 5, with squares and get them to self-organize into [pentominoes](https://en.wikipedia.org/wiki/Pentomino).
-At each step, partition the board into tiles. Initially, all the tiles will be of size 1.
-While there are no tiles of size 6 or more, select one of the tiles of smallest size.
-Find the neighbouring tiles that touch this tile. Have a square defect from the selected tile to a smallest neighbour.
-The defector is chosen at random when there is more than one square that could defect.
-If a tile gets to size 6 it is 'dissolved', which is to say that all its component squares are detached.
-The loop ends when all tiles are of size 5.
