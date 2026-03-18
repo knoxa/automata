@@ -13,15 +13,15 @@ import cells.Sense;
 import cells.Square;
 import orient.Chooser;
 import orient.Partitioner;
+import tiles.Tile;
 
 public class TileAction {
 
-	public static void dissolve(Square active) {
+	public static void dissolveTile(Set<Square> tile) {
 		
 		Set<Action> moves = new HashSet<Action>();
-		Set<Square> activeTile = Partitioner.getTileContaining(active);
 		
-		for ( Square square: activeTile ) {
+		for ( Square square: tile ) {
 			
 			Action action = new Action();
 			action.setAct(Act.DETACH); action.setActor(square); action.setSense(new Sense());
@@ -31,7 +31,9 @@ public class TileAction {
 		Action.makeMoves(moves);
 	}
 
-	public static void oneSquareDefects(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+	public static Square anySquareDefects(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
+		Square defector = null;
 		
 		Set<Action> moves = new HashSet<Action>();
 		
@@ -99,9 +101,118 @@ public class TileAction {
 		// make the move
 		Action action = new Action();
 		action.setAct(Act.DEFECT); action.setActor(from); action.setSense(sense);
-		moves.add(action);		
+		moves.add(action);
+		defector = action.getActor();
 	
 		Action.makeMoves(moves);
+		
+		return defector;
+	}
+
+	public static Square detachableSquareDefects(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
+		Square defector = null;
+		
+		Map<Integer, Set<Square>> ppMap = Partitioner.partition(activeTile);
+		Map<Integer, Set<Square>> xxMap = Tile.getDetachableSquares(ppMap);
+
+		Set<Action> moves = new HashSet<Action>();
+		
+		// key = squares in neighbouring tiles, values = squares in this tile that can see them
+		Map<Square, Set<Square>> squaresThatCanSee = new HashMap<>();
+				
+		// find all the squares that can be "seen" from any tile in the active tile
+		Set<Square> visible = new HashSet<Square>();
+		
+		activeTile =  xxMap.get(1);
+		
+		for ( Square square: activeTile ) {
+			
+			Set<Sense> seen = environment.get(square);
+			for ( Sense sense: seen ) {
+				
+				visible.add(sense.getSquare());
+				Maps.addMapValue(squaresThatCanSee, sense.getSquare(), square);
+			}
+		}
+		
+		// construct the local neighbourhood, excluding the active tile
+		Set<Square> neighbourhood = new HashSet<Square>();
+		neighbourhood.addAll(visible);		
+		neighbourhood.removeAll(activeTile);
+		
+		// partition it
+		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(neighbourhood);
+		Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(partitionMap);
+		
+		Map<Square, Set<Integer>> partitionLookup = Maps.invertMap(partitionMap);
+		
+		// get smallest tile size
+		List<Integer> sizes = new ArrayList<Integer>();
+		sizes.addAll(sizeMap.keySet());
+		Collections.sort(sizes);		
+		int smallestSize = sizes.get(0);
+				
+		// a cell in the active tile defects to smallest neighbouring tile 
+		
+		// choose the target tile
+		Set<Integer> candidates = new HashSet<Integer>();
+		candidates.addAll(sizeMap.get(smallestSize));	
+		Integer chosenTile = chooser.randomFromSet(candidates);
+		
+		// find squares in the active tile that can see the target
+		Map<Square, Set<Sense>> connectable = new HashMap<>();
+	
+		for ( Square square: activeTile ) {
+			
+			Set<Sense> sensed = environment.get(square);
+			
+			for ( Sense sense: sensed ) {
+				
+				if ( !(activeTile.contains(sense.getSquare())) && partitionLookup.get(sense.getSquare()).iterator().next() == chosenTile ) {
+					
+					Maps.addMapValue(connectable, square, sense);
+				}
+			}
+		}
+	
+		// choose one of the visible target squares ...
+		Square from = chooser.randomFromSet(connectable.keySet());
+		// ... and a suitable direction from that square
+		Sense sense = chooser.randomFromSet(connectable.get(from));
+		
+		// make the move
+		Action action = new Action();
+		action.setAct(Act.DEFECT); action.setActor(from); action.setSense(sense);
+		moves.add(action);
+		defector = action.getActor();
+	
+		Action.makeMoves(moves);
+		
+		return defector;
+	}
+
+	public static Square oneSquareDisplaces(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
+//		Square defector = anySquareDefects(activeTile, environment, chooser);
+		Square defector = detachableSquareDefects(activeTile, environment, chooser);
+		Set<Square> modifiedTile = new HashSet<Square>();
+		modifiedTile.add(defector);
+		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(modifiedTile);
+		modifiedTile.addAll(partitionMap.get(1));
+
+		Map<Integer, Set<Square>> detachableMap = Tile.getDetachableSquares(partitionMap);
+		Set<Square> options = detachableMap.get(1);
+		options.remove(defector);		
+		Square toDetach = chooser.randomFromSet(options);
+		
+		List<Action> actions = new ArrayList<>();
+		Action action = new Action();
+		action.setAct(Act.DETACH); action.setActor(toDetach); action.setSense(new Sense());
+		actions.add(action);
+		
+		Action.makeMoves(actions);
+		return toDetach;
 	}
 
 }
