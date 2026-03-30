@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import act.Act;
+import act.Action;
 import act.TileAction;
 import cakes.category.Maps;
 import cells.Sense;
 import cells.Square;
+import observe.SquareObserver;
 import orient.Chooser;
 import orient.Partitioner;
 import worlds.Board;
@@ -255,6 +259,282 @@ public class Pentomino {
 		}
 		
 		return tileFragments;
+	}
+
+	public static void transform(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b, Chooser chooser) {
+		
+		HashSet<Integer> tiles = new HashSet<Integer>(); tiles.add(a); tiles.add(b);
+		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, environment, tiles);
+		List<Set<Set<Square>>> possibleMoves = getPossibleSwaps(contacts);
+		
+		if ( possibleMoves.size() > 0 ) {
+			
+			Set<Set<Square>> option = chooser.randomFromList(possibleMoves);
+
+			List<Action> moves = getSwapActions(option, contacts);
+			Action.makeMoves(moves);
+		}
+	}
+
+
+	public static List<Set<Set<Square>>> getPossibleSwaps(Map<Square, Set<Sense>> contacts) {
+		
+		// find fragments in a pair of tiles that can be swapped
+		
+		List<Set<Set<Square>>> options = new ArrayList<>();
+	
+		// get the detachable subsets (fragments) of each of the tiles
+		// key is tile number, value is set of detachable fragments (each of which is  a set of squares)
+		
+		Map<Integer, Set<Set<Square>>> tileFragments = getDetachableFragments(contacts);
+	
+		if ( !tileFragments.isEmpty() ) {
+					
+			Integer tile1 = 1; Integer tile2 = 2; // assuming there are 2 tiles
+						
+			for ( Set<Square> fragment1: tileFragments.get(tile1) ) {
+				
+				for ( Set<Square> fragment2: tileFragments.get(tile2) ) {
+					
+					if ( fragment1.size() == fragment2.size() ) {
+											
+						// get points-of-contact in each of the tile fragments				
+						Set<Square> poc1 = new HashSet<Square>(); poc1.addAll(fragment1); poc1.retainAll(contacts.keySet());
+						Set<Square> poc2 = new HashSet<Square>(); poc2.addAll(fragment2); poc2.retainAll(contacts.keySet());
+	
+						//get the squares seen by the contact squares in each fragment ...
+						Set<Square> sensed1 = new HashSet<>();
+						Set<Square> sensed2 = new HashSet<>();				
+						for ( Square s: poc1 )  sensed1.addAll(getSensedSquares(contacts.get(s)));
+						for ( Square s: poc2 )  sensed2.addAll(getSensedSquares(contacts.get(s)));
+	
+						// ... these will the squares on the other tile that this fragment might attach to
+						// remove any squares that are part of the other fragment (don't want to connect fragment to fragment)
+						sensed1.removeAll(fragment2);
+						sensed2.removeAll(fragment1);
+	
+						if ( !sensed1.isEmpty() && !sensed2.isEmpty() ) {
+							
+							// we have two fragments of the same size, that can detach from their tile, and that can 
+							// attach to the other tile, without interfering with each other.
+							Set<Set<Square>> option = new HashSet<>();
+							option.add(fragment1); option.add(fragment2);
+							options.add(option);
+						}
+					}
+				}			
+			}
+		}
+			
+		return options;		
+	}
+
+	
+	public static List<Action> getSwapActions(Set<Set<Square>> option, Map<Square, Set<Sense>> contacts) {
+		
+		List<Action> actions = new ArrayList<>();
+		
+		Iterator<Set<Square>> iter = option.iterator();		
+		Set<Square> fragment1 = iter.next();
+		Set<Square> fragment2 = iter.next();
+		actions.addAll(Tile.detachTileActions(fragment1));
+		actions.addAll(Tile.detachTileActions(fragment2));
+
+		for ( Square x: fragment1 ) {
+			
+			Set<Sense> touches = contacts.get(x);
+			
+			if ( touches != null ) {
+				
+				for ( Sense touch: touches ) {
+					
+					if ( !fragment2.contains(touch.getSquare()) ) {
+						
+						Action action = new Action();
+						action.setAct(Act.ATTACH); action.setActor(x); action.setSense(touch);
+						actions.add(action);
+					}
+				}
+			}
+		}
+
+		for ( Square x: fragment2 ) {
+			
+			Set<Sense> touches = contacts.get(x);
+			
+			if ( touches != null ) {
+				
+				for ( Sense touch: touches ) {
+					
+					if ( !fragment1.contains(touch.getSquare()) ) {
+						
+						Action action = new Action();
+						action.setAct(Act.ATTACH); action.setActor(x); action.setSense(touch);
+						actions.add(action);
+					}
+				}
+			}
+		}
+		
+		return actions;
+
+	}
+	
+	
+	public static Set<Square> getSensedSquares(Set<Sense> sensed) {
+		
+		Set<Square> squares = new HashSet<Square>();
+		for ( Sense sense: sensed )  squares.add(sense.getSquare());	
+		return squares;
+	}
+
+	
+	public static void chaseTheAce(Square ace, Set<Square> tileFrom, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
+		boolean finished = false; int steps = 0;
+		
+		Set<Square> currentTile = tileFrom;
+		
+		while ( !finished && ace != null && steps < 200 ) {
+
+			// find squares (in neighbouring tiles) that the displaced square might connect to
+			Map<Square, Sense> possibleConnections = selectCandidateTargetSquares(ace, environment, currentTile);
+			// get the tiles that these belong to
+			Map<Integer, Set<Square>> possibleTiles = Partitioner.partition(possibleConnections.keySet());
+			
+			// work out where to connect the displaced square
+			Map<Integer, Set<Integer>> sizes = Partitioner.collectPartitionSizes(possibleTiles);
+			System.out.println("step: " + steps + " - " + sizes);
+			
+			if ( sizes.get(4) != null ) { 
+				
+				// connect to a tile of size 4 if there is one
+				Integer tileOfSize4 = chooser.randomFromSet(sizes.get(4));
+				System.out.println("444444444444444444444444444444444444444 " );
+				Set<Square> candidates = possibleConnections.keySet();
+				candidates.retainAll(possibleTiles.get(tileOfSize4));
+				System.out.println(candidates);
+				Square target = chooser.randomFromSet(candidates);
+				
+				List<Action> actions = new ArrayList<Action>();
+				Action action = new Action(ace, Act.ATTACH, possibleConnections.get(target));
+				actions.add(action);
+				Action.makeMoves(actions);
+
+				finished = true;
+			}
+			else {
+				
+				// make a random choice for where the displaced square will go
+				Square choice = chooser.randomFromSet(possibleConnections.keySet());	
+				
+				// displace a square from the target tile that isn't the one where the displaced square will attach
+				Set<Square> except = new HashSet<Square>(); except.add(choice);
+				currentTile = Partitioner.getTileContaining(choice);
+				System.out.println("aa " + currentTile);
+				Square next = TileAction.displaceSquare(currentTile, environment, chooser, except);
+				
+				if ( next != null ) {
+					
+					List<Action> actions = new ArrayList<Action>();
+					Action action = new Action(ace, Act.ATTACH, possibleConnections.get(choice));
+					actions.add(action);
+					Action.makeMoves(actions);
+				}
+				
+				ace = next; steps++;
+				//finished = true;
+			}
+		}
+	}
+	
+	public static Map<Square, Sense> selectCandidateTargetSquares(Square source, Map<Square, Set<Sense>> environment, Set<Square> except) {
+		
+		// candidates are squares neighbouring 'source' that aren't in 'except'
+		List<Square> cadidateTargets = new ArrayList<>();
+		Map<Square, Sense> neighbours = mapSquareToSense(environment.get(source));
+		cadidateTargets.addAll(neighbours.keySet());
+		cadidateTargets.removeAll(except);
+		for ( Square exception: except )  neighbours.remove(exception);
+		return neighbours;
+	}
+	
+	public static Map<Integer, Set<Square>> selectCandidateTargetTiles(Square square, Map<Square, Set<Sense>> environment) {
+		
+		Set<Sense> visible = environment.get(square);
+		Map<Square, Sense> map = mapSquareToSense(visible);
+		
+		Map<Integer, Set<Square>> localTiles = Partitioner.partition(map.keySet());
+		Map<Integer, Integer> sizes = Partitioner.getPartitionSizes(localTiles);
+		System.out.println(Pentomino.getPentominoes(localTiles));
+		System.out.println("xxxx " + sizes);
+		
+		return localTiles;		
+	}
+	
+	
+	public static Map<Square, Sense> mapSquareToSense(Set<Sense> observations) {
+		
+		Map<Square, Sense> squareToSense = new HashMap<>();
+		for ( Sense sense: observations )  squareToSense.put(sense.getSquare(), sense);
+		return squareToSense;
+	}
+
+	
+	public static Square displace(Square ace, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
+		Set<Square> activeTile = new HashSet<>(); activeTile.add(ace);
+		Square detached = null;
+		
+		// key = squares in neighbouring tiles, values = squares in this tile that can see them
+		Map<Square, Set<Square>> squaresThatCanSee = new HashMap<>();
+				
+		// find all the squares that can be "seen" from any tile in the active tile
+		Set<Square> visible = new HashSet<Square>();
+		
+		for ( Square square: activeTile ) {
+			
+			Set<Sense> seen = environment.get(square);
+			for ( Sense sense: seen ) {
+				
+				visible.add(sense.getSquare());
+				Maps.addMapValue(squaresThatCanSee, sense.getSquare(), square);
+			}
+		}
+		
+		// construct the local neighbourhood, excluding the active tile
+		Set<Square> neighbourhood = new HashSet<Square>();
+		//neighbourhood.addAll(activeTile);
+		neighbourhood.addAll(visible);
+		
+		// partition it
+		Map<Integer, Set<Square>> nextMap = Partitioner.partition(neighbourhood);
+		Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(nextMap);
+	
+		if ( sizeMap.get(4) == null ) {
+			
+			detached = TileAction.displaceSquare(activeTile, environment, chooser, new HashSet<Square>());
+		}
+		else {
+			
+			visible.retainAll(nextMap.get(chooser.randomFromSet(sizeMap.get(4))));
+			Square target = chooser.randomFromSet(visible);
+			
+			for ( Sense sense: environment.get(ace) ) {
+				
+				if ( sense.getSquare() == target ) {
+					
+					List<Action> actions = new ArrayList<>();
+					Action action = new Action();
+					action.setAct(Act.ATTACH); action.setActor(ace); action.setSense(sense);
+					actions.add(action);
+					
+					Action.makeMoves(actions);
+				}
+			}
+		}
+		
+		return detached;
 	}
 
 }
