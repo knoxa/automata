@@ -5,26 +5,30 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import act.Action;
 import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
 import observe.BoardObserver;
 import observe.SquareObserver;
+import orient.Chooser;
 import orient.Partitioner;
 import tiles.Pentomino;
 import tiles.PentominoType;
 import tiles.Tile;
 import worlds.Board;
 import worlds.BoardManager;
-import xslt.Pipeline;
 
 class PentominoTest {
 
@@ -104,10 +108,11 @@ class PentominoTest {
 	}
 	
 	@Test	
-	void pair() {
+	void pair() throws FileNotFoundException {
 		
 		Board board = new Board(4,3);	
 		Square[][] grid = board.getGrid();
+		Map<Square, Set<Sense>> environment = BoardObserver.lookAbout(board);
 		
 		// a P tile
 		Tile.attach(grid[0][0], Direction.EAST, grid[0][1]);
@@ -164,11 +169,19 @@ class PentominoTest {
 		
 		// square at 0,0 is detachable
 		assertTrue(Tile.isDetachable(grid[0][0]));
-		
+
 		// there are 4 detachable squares in the P tile and 3 in the Y tile
-		Map<Integer, Set<Square>> detachableSquares = Tile.getDetachableSquares(partitionMap);
-		assertEquals(4, detachableSquares.get(1).size());
-		assertEquals(3, detachableSquares.get(2).size());
+		Set<Square> p = Partitioner.getTileContaining(grid[0][0]);
+		assertEquals(4, Tile.getDetachableSquares(p).size());
+		Set<Square> y = Partitioner.getTileContaining(grid[2][0]);
+		assertEquals(3, Tile.getDetachableSquares(y).size());
+		
+		Map<PentominoType, Integer> lookupByType = new HashMap<>();
+		
+		for ( Integer partNo: partitionMap.keySet() ) {
+			
+			lookupByType.put(Pentomino.identifyPentomino(partitionMap.get(partNo)), partNo);
+		}
 		
 		Map<Square, Set<Square>> squareContacts = SquareObserver.getSensedSquaresBySquare(contacts);
 		// square at 1,0 is in contact with 1 square (at 2,0)
@@ -179,24 +192,25 @@ class PentominoTest {
 		
 		Map<Integer, Set<Square>> tileContacts = SquareObserver.getSensedSquaresByTile(contacts, partitionMap);
 		// the P tile sees 3 squares of the Y tile
-		assertEquals(3, tileContacts.get(1).size());
-		assertTrue(tileContacts.get(1).contains(grid[2][0]));
-		assertTrue(tileContacts.get(1).contains(grid[2][1]));
-		assertTrue(tileContacts.get(1).contains(grid[1][2]));
+		int pNo = lookupByType.get(PentominoType.P); int yNo = lookupByType.get(PentominoType.Y);
+		assertEquals(3, tileContacts.get(pNo).size());
+		assertTrue(tileContacts.get(pNo).contains(grid[2][0]));
+		assertTrue(tileContacts.get(pNo).contains(grid[2][1]));
+		assertTrue(tileContacts.get(pNo).contains(grid[1][2]));
 		// the Y tile sees 3 squares of the P tile
-		assertEquals(3, tileContacts.get(2).size());
-		assertTrue(tileContacts.get(2).contains(grid[1][0]));
-		assertTrue(tileContacts.get(2).contains(grid[1][1]));
-		assertTrue(tileContacts.get(2).contains(grid[0][2]));
+		assertEquals(3, tileContacts.get(yNo).size());
+		assertTrue(tileContacts.get(yNo).contains(grid[1][0]));
+		assertTrue(tileContacts.get(yNo).contains(grid[1][1]));
+		assertTrue(tileContacts.get(yNo).contains(grid[0][2]));
 
-		Set<Square> contacts1 = tileContacts.get(1);
+		Set<Square> contacts1 = tileContacts.get(pNo);
 		// restrict to contacts in tile2
-		contacts1.retainAll(partitionMap.get(2));
+		contacts1.retainAll(partitionMap.get(yNo));
 		// should still be 3 contacts
 		assertEquals(3, contacts1.size());
-		Set<Square> contacts2 = tileContacts.get(2);
+		Set<Square> contacts2 = tileContacts.get(yNo);
 		// restrict to contacts in tile1
-		contacts2.retainAll(partitionMap.get(1));
+		contacts2.retainAll(partitionMap.get(pNo));
 		// should still be 3 contacts
 		assertEquals(3, contacts2.size());
 		
@@ -212,22 +226,43 @@ class PentominoTest {
 		
 		Map<Integer, Set<Set<Square>>> tileFragments = Pentomino.getDetachableFragments(contacts);
 		// there are 6 detachable fragments in the P tile (square at 0,0 is detachable - but not a fragment because it has no contacts)
-		assertEquals(6, tileFragments.get(1).size());
+		assertEquals(6, tileFragments.get(pNo).size());
 		assertTrue(Tile.isDetachable(grid[0][0]));
 		// there are 3 detachable fragments in the Y tile (square at 3,2 is detachable - but not a fragment because it has no contacts)
-		assertEquals(3, tileFragments.get(2).size());
+		assertEquals(3, tileFragments.get(yNo).size());
 		assertTrue(Tile.isDetachable(grid[2][3]));
 		
-		Pipeline p = new Pipeline();
-		
-		try {
-			p.setOutput(new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
-			BoardManager.serialize(board, p.getContentHandler());
+		List<Set<Set<Square>>> options = Pentomino.getPossibleSwaps(contacts);
+		// there are 5 options for swapping fragments between P and Y
+		assertEquals(5, options.size());
 
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		// one of the options should be to swap (2,0) and (0,2)
+		Set<Square> pSet = new HashSet<>(); pSet.add(grid[0][2]);
+		Set<Square> ySet = new HashSet<>(); ySet.add(grid[2][0]);
+		Set<Set<Square>> anOption = new HashSet<>(); anOption.add(pSet); anOption.add(ySet);
+		assertTrue(options.contains(anOption));
+
+		List<Action> actions = Pentomino.getSwapActions(anOption, contacts);
+		
+		// make moves - result is a P and a T
+		Action.makeMoves(actions);
+
+		partitionMap = Partitioner.partition(board.getSquares());
+		Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
+		assertTrue(pentominoes.keySet().contains(PentominoType.P));
+		assertTrue(pentominoes.keySet().contains(PentominoType.T));
+		
+		// random mutation (with seed = 2) - creates [P, Z]
+		Integer tileP = pentominoes.get(PentominoType.P).iterator().next();
+		Integer tileT = pentominoes.get(PentominoType.T).iterator().next();
+		Pentomino.transform(partitionMap, environment, tileP, tileT, new Chooser(2));
+		
+		partitionMap = Partitioner.partition(board.getSquares());
+		pentominoes = Pentomino.getPentominoes(partitionMap);
+		assertTrue(pentominoes.keySet().contains(PentominoType.P));
+		assertTrue(pentominoes.keySet().contains(PentominoType.Z));
+		
+		BoardManager.writeBoardToFile(board, new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
 	}	
 
 }
