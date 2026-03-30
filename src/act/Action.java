@@ -13,7 +13,19 @@ public class Action {
 	Act act;
 	double probability = 1.0;
 	
+	public Action() {
+	}
 	
+	public Action(Square actor, Act act) {
+		setActor(actor);
+		setAct(act);
+	}
+	
+	public Action(Square actor, Act act, Sense sense) {
+		this(actor, act);
+		setSense(sense);
+	}
+
 	public Square getActor() {
 		return actor;
 	}
@@ -55,7 +67,7 @@ public class Action {
 		
 		for ( Action action: options ) {
 			
-			System.out.println(".. " + action.actor + " *" + action.act +"* --> " + action.sense.getDirection() + " " + action.sense.getSquare());
+			//System.out.println(".. " + action.actor + " *" + action.act +"* --> " + action.sense.getDirection() + " " + action.sense.getSquare() + " - " + action.getProbability());
 					
 			switch (action.act) {
 			
@@ -63,8 +75,7 @@ public class Action {
 				Tile.attach(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
 				
-			case DETACH:
-				
+			case DETACH:				
 				if (action.sense.getSquare() == null)  Tile.detach(action.actor);
 				else Tile.detach(action.actor, action.sense.getDirection(), action.sense.getSquare());
 				break;
