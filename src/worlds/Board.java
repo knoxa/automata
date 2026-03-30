@@ -1,8 +1,10 @@
 package worlds;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import cells.Direction;
 import cells.Square;
 
 public class Board {
@@ -40,6 +42,16 @@ public class Board {
 				grid[row][col].setLabel(label);
 				squares.add(grid[row][col]);
 			}
+		}
+	}
+	
+	public void clear() {
+		
+		for ( Square square: squares ) {
+			
+			Map<Direction, Square> neighbourMap = square.getNeighbourMap();
+			
+			for ( Direction d: neighbourMap.keySet() )   square.clearNeighbour(d);
 		}
 	}
 
