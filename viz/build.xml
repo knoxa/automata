@@ -14,4 +14,8 @@
 		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
 	</target>
 
+	<target name="test">
+		<xslt in="../experiments/board-solution7.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+	</target>
+
 </project>
