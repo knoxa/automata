@@ -26,7 +26,12 @@ public class Chooser {
 		
 		List<T> list = new ArrayList<>();
 		list.addAll(candidates);
-		T selected = (list.size() > 1) ? list.get(random.nextInt(list.size())) : list.get(0);
+		return randomFromList(list);
+	}
+
+	public <T> T randomFromList(List<T> candidates) {
+		
+		T selected = (candidates.size() > 1) ? candidates.get(random.nextInt(candidates.size())) : candidates.get(0);
 		return selected;
 	}
 
@@ -77,6 +82,12 @@ public class Chooser {
 
 		// select randomly from this set
 		return randomFromSet(partition);
+	}
+	
+	
+	public Random getRandom() {
+		
+		return random;
 	}
 
 }
