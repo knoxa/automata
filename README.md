@@ -29,4 +29,8 @@ This operation fails if it would cause tiles to overlap.
 * **CAPTURE**: This is equivalent to DETACH from target followed by ATTACH to source.
 * **DEFECT**: This is equivalent to DETACH from source followed by ATTACH to target.
 
-## Pentominoes
+## Applications
+
+* Solving the [pentomino puzzle](https://knoxa.github.io/pentominoes/).
+
+
