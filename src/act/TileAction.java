@@ -11,6 +11,7 @@ import java.util.Set;
 import cakes.category.Maps;
 import cells.Sense;
 import cells.Square;
+import observe.SquareObserver;
 import orient.Chooser;
 import orient.Partitioner;
 import tiles.Tile;
@@ -121,7 +122,7 @@ public class TileAction {
 		// key = squares in neighbouring tiles, values = squares in this tile that can see them
 		Map<Square, Set<Square>> squaresThatCanSee = new HashMap<>();
 				
-		// find all the squares that can be "seen" from any tile in the active tile
+		// find all the squares that can be "seen" from any square in the active tile
 		Set<Square> visible = new HashSet<Square>();
 		
 		activeTile =  xxMap.get(1);
@@ -192,9 +193,36 @@ public class TileAction {
 		return defector;
 	}
 
-	public static Square oneSquareDisplaces(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+	public static Square displaceSquare(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser, Set<Square> except) {
+			
+		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(environment.keySet());
+		Map<Square, Set<Sense>> observations = SquareObserver.sense(partitionMap, environment, partitionMap.keySet());
+		Set<Square> squaresBorderingNeighbouringTiles = SquareObserver.getSquaresThatCanSee(activeTile, observations);
 		
-//		Square defector = anySquareDefects(activeTile, environment, chooser);
+		Map<Integer, Set<Square>> detachableMap = Tile.getDetachableSquares(Partitioner.partition(activeTile));
+		Set<Square> options = detachableMap.get(1); // assumption is that there is only one tile
+		
+		System.out.println("o1: " + options);
+		
+		options.removeAll(except);
+		System.out.println("o2: " + options);
+		options.retainAll(squaresBorderingNeighbouringTiles);
+		System.out.println("o3: " + options);
+		if ( options.size() == 0 ) return null; // !!!!!!
+		Square toDetach = chooser.randomFromSet(options);
+
+		List<Action> actions = new ArrayList<>();
+		Action action = new Action();
+		action.setAct(Act.DETACH); action.setActor(toDetach); action.setSense(new Sense());
+		actions.add(action);
+		
+		Action.makeMoves(actions);
+		return toDetach;
+	}
+
+	
+	public static Square displaceSquare(Set<Square> activeTile, Map<Square, Set<Sense>> environment, Chooser chooser) {
+		
 		Square defector = detachableSquareDefects(activeTile, environment, chooser);
 		Set<Square> modifiedTile = new HashSet<Square>();
 		modifiedTile.add(defector);
