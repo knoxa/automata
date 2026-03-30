@@ -3,17 +3,26 @@ package test.automata;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
 import observe.BoardObserver;
+import orient.Partitioner;
+import tiles.Pentomino;
+import tiles.PentominoType;
 import worlds.Board;
+import worlds.BoardManager;
 
 class BoardTest {
 
@@ -70,6 +79,28 @@ class BoardTest {
 		assertEquals(2, directions.size());
 		assertTrue(directions.contains(Direction.EAST));
 		assertTrue(directions.contains(Direction.NORTH));
+	}
+
+	@Test
+	void readBoard() {
+		
+		try {
+			Board board = BoardManager.loadFromXml(getBoardStream());
+			Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
+			Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
+
+			assertEquals(11, pentominoes.keySet().size() );
+			assertEquals(2, pentominoes.get(PentominoType.V).size() );
+			
+		}
+		catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public InputStream getBoardStream() {
+		
+		return this.getClass().getResourceAsStream("board1.xml");
 	}
 
 }
