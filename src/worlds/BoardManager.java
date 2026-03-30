@@ -1,10 +1,19 @@
 package worlds;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributesImpl;
 
 import cakes.category.Maps;
@@ -13,6 +22,7 @@ import cells.Square;
 import orient.Partitioner;
 import tiles.Pentomino;
 import tiles.PentominoType;
+import xslt.Pipeline;
 
 public class BoardManager {
 
@@ -26,8 +36,8 @@ public class BoardManager {
 		ch.startDocument();
 		
 		AttributesImpl attr = new AttributesImpl();
-		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(board.getHeight()));
-		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(board.getWidth()));
+		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(board.getWidth()));
+		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(board.getHeight()));
 		ch.startElement("", "board", "board", attr);
 		
 		for ( int h = 0; h < board.getHeight(); h++ ) {
@@ -67,4 +77,64 @@ public class BoardManager {
 		ch.endDocument();
 	}
 
+	
+	public static Board loadFromXml(InputStream input) throws ParserConfigurationException, SAXException, IOException {
+		
+		SAXParserFactory factory = SAXParserFactory.newInstance();
+		SAXParser parser = factory.newSAXParser();
+		XMLReader reader = parser.getXMLReader();
+		
+		BoardFilter filter = new BoardFilter();
+		reader.setContentHandler(filter);
+		reader.parse(new InputSource(input));
+		
+		return filter.getBoard();
+
+	}
+
+
+	public static void reportPartitions(Map<Integer, Set<Square>> partitionMap, Board board) {
+				
+		int[][] values = new int[board.getHeight()][board.getWidth()];
+		Square[][] grid = board.getGrid();
+				
+		Map<Square, Set<Integer>> reverse = cakes.category.Maps.invertMap(partitionMap);
+		System.out.println(partitionMap.keySet().size() + " partitions");
+	
+		for ( int r = 0; r < board.getHeight(); r++ ) {
+			
+			for ( int c = 0; c < board.getWidth(); c++ ) {
+				
+				Square s = grid[r][c];
+				values[r][c] = reverse.get(s).iterator().next();
+			}
+			
+		}
+	
+	
+		for ( int[] row: values ) {
+			
+			for ( int cell: row ) {
+				
+				System.out.print(cell + "\t" );
+			}
+			System.out.println();
+		}
+	}
+
+	
+	public static void writeBoardToFile(Board board, FileOutputStream file) {
+			
+		Pipeline p = new Pipeline();
+		
+		try {
+			p.setOutput(file);
+			BoardManager.serialize(board, p.getContentHandler());
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }
