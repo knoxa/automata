@@ -129,6 +129,14 @@ public class Partitioner {
 	}
 	
 	
+	public static Map<Integer, Set<Integer>> collectPartitionSizes(Map<Integer, Set<Square>> partitionMap) {
+		
+		Map<Integer, Integer> sizes = getPartitionSizes(partitionMap);
+		Map<Integer, Set<Integer>> summary = new HashMap<>();
+		for ( Integer partNo: sizes.keySet() ) Maps.addMapValue(summary, sizes.get(partNo), partNo);
+		return summary;
+	}
+	
 	public static Map<Integer, Set<Integer>> getPartitionGraph(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment) {
 		
 		Map<Integer, Set<Integer>> graph = new HashMap<Integer, Set<Integer>>();		
