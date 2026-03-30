@@ -126,12 +126,24 @@ public class SquareObserver {
 						
 		return observations;
 	}
+	
+	public static Set<Square> getSquaresThatCanSee(Set<Square> squares, Map<Square, Set<Sense>> observations) {
+		
+		Set<Square> results = new HashSet<>();
+		
+		for ( Square square: squares ) {
+			
+			if ( observations.get(square) != null )  results.add(square);
+		}
+		
+		return results;
+	}
 
 	
 	public static Map<Square, Set<Square>> getSensedSquaresBySquare(Map<Square, Set<Sense>> contacts) {
 		
 		// take a map of observations keyed by squares and create a map where the key is the same but
-		// the values are the sense squares.
+		// the values are the sensed squares.
 		
 		Map<Square, Set<Square>> sensedSquares = new HashMap<>();	
 		
@@ -188,6 +200,8 @@ public class SquareObserver {
 	
 	public static Map<Square, Set<Sense>> restrictEnvironment(Map<Square, Set<Sense>> environment, Set<Square> locality) {
 		
+		// restrict the environment to the given locality - squares outside do not sense, and are not sensed
+		
 		Map<Square, Set<Sense>> filtered = new HashMap<>();
 		
 		for ( Square square: environment.keySet() ) {
@@ -207,5 +221,25 @@ public class SquareObserver {
 		
 		return filtered;
 	}
-
+	
+	
+	public static Map<Square, Set<Sense>> sensedByTile(Map<Square, Set<Sense>> environment, Set<Square> tile) {
+		
+		Map<Square, Set<Sense>> filtered = new HashMap<>();
+		
+		for ( Square square: tile ) {
+			
+			Set<Sense> visible = new HashSet<Sense>();
+			
+			for ( Sense sense: environment.get(square) ) {
+				
+				if ( !tile.contains(sense.getSquare()) )  visible.add(sense);
+			}
+			
+			filtered.put(square, visible);
+		}
+		
+		return filtered;
+	}
+	
 }
