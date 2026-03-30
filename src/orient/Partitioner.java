@@ -107,19 +107,7 @@ public class Partitioner {
 			}
 		}
 	}
-	
-	public static void partitionGraph(State state) {
 		
-		Map<Integer, Integer> sizes = new HashMap<Integer, Integer>();		
-
-		for ( Integer partNo: state.partitionMap.keySet() ) {
-			
-			sizes.put(partNo, state.partitionMap.get(partNo).size());
-		}
-		state.partitionGraph = getPartitionGraph(state.getPartitionMap(), state.getEnvironment());
-		state.partitionSizes = sizes;
-	}
-	
 	
 	public static Map<Integer, Integer> getPartitionSizes(Map<Integer, Set<Square>> partitionMap) {
 		
