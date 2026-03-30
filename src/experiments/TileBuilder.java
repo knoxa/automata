@@ -43,14 +43,13 @@ public class TileBuilder {
 	
 	public static void fillBoard(String[] args) {
 
-		Board board = null;
+		Board board = new Board(6,10);		
 		
-		//Set<PentominoType> placed = EnumSet.noneOf(PentominoType.class);
+		Chooser chooser = new Chooser(6);
 			
-		for ( int trial = 20000; trial < 50000; trial++ ) {
+		for ( int trial = 0; trial < 50000; trial++ ) {
 			
-			Chooser chooser = new Chooser(trial);
-			board = new Board(6,10);		
+			board.clear();
 			fillBoardWithPentominoes(board, chooser);
 
 			System.out.println("Trial: " + trial);
