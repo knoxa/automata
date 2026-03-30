@@ -222,7 +222,7 @@ public class Tile {
 		
 		// A recursive method to position all squares that can be reached from the given one.
 		
-		// The square "from" is places at the given coordinates, then the method is called again with all neighbours of "from", with coordinates adjusted accordingly.
+		// The square "from" is placed at the given coordinates, then the method is called again with all neighbours of "from", with coordinates adjusted accordingly.
 		// The "coordinates" map stored already located squares.
 		// The "layout" map stores squares at locations. There will be more than one square (a collision) at a location if the tiles overlap.
 		// the return value is "true" if the tile (square and linked neighbours) can be positioned without causing a collision.
