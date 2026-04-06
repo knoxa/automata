@@ -9,6 +9,9 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import cells.Direction;
 import cells.Square;
+import orient.Partitioner;
+import tiles.Pentomino;
+import tiles.PentominoType;
 
 public class Plane {
 
@@ -18,7 +21,7 @@ public class Plane {
 		ch.startDocument();
 		
 		int xMin = Integer.MAX_VALUE, yMin = Integer.MAX_VALUE, xMax = Integer.MIN_VALUE, yMax = Integer.MIN_VALUE;
-		
+
 		for ( Square square: coordinates.keySet() ) {
 			
 			Integer[] coords = coordinates.get(square);			
@@ -47,6 +50,14 @@ public class Plane {
 					attr.addAttribute("", "row", " row",  "Integer",  String.valueOf(h));
 					attr.addAttribute("", "col",  "col",  "Integer",  String.valueOf(w));
 					attr.addAttribute("", "label", "label", "String",  square.getLabel());
+					
+					Set<Square> tile = Partitioner.getTileContaining(square);
+					
+					if ( tile.size() == 5 ) {
+						
+						PentominoType pentomino = Pentomino.identifyPentomino(tile);
+						attr.addAttribute("", "pentomino", "pentomino", "String",  pentomino.toString());
+					}
 
 					ch.startElement("", "square", "square", attr);
 					
