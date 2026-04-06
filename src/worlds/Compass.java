@@ -1,6 +1,7 @@
 package worlds;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +60,38 @@ public class Compass {
 	public static Integer getOffsetY(Direction direction) {
 		
 		return offsetsY.get(direction);
+	}
+	
+	private static Map<Direction, Direction> rotate(int amount) {
+		
+		Map<Direction, Direction> transform = new HashMap<>();
+		for ( Direction direction: compass )  transform.put(direction, compass[(compassMap.get(direction) + amount) % 4]);
+		return transform;
+	}
+	
+	public static Map<Direction, Direction> rotate90() {
+		return rotate(1);
+	}
+	
+	public static Map<Direction, Direction> rotate270() {
+		
+		return rotate(3);
+	}
+	
+	public static Map<Direction, Direction> reflectHorizontal() {
+		
+		Map<Direction, Direction> transform = new HashMap<>();
+		transform.put(Direction.NORTH, Direction.SOUTH); transform.put(Direction.SOUTH, Direction.NORTH);
+		transform.put(Direction.EAST, Direction.EAST);   transform.put(Direction.WEST, Direction.WEST);
+		return transform;
+	}
+	
+	public static Map<Direction, Direction> reflectVertical() {
+		
+		Map<Direction, Direction> transform = new HashMap<>();
+		transform.put(Direction.NORTH, Direction.NORTH); transform.put(Direction.SOUTH, Direction.SOUTH);
+		transform.put(Direction.EAST, Direction.WEST);   transform.put(Direction.WEST, Direction.EAST);
+		return transform;
 	}
 
 }
