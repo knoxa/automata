@@ -22,7 +22,7 @@ import worlds.Board;
 
 public class Pentomino {
 	
-	private static final int MAX_ITERATIONS = 2000;
+	private static final int MAX_ITERATIONS = 5000;
 
 	public static PentominoType identifyPentomino(Set<Square> tile) {
 		
@@ -261,7 +261,7 @@ public class Pentomino {
 		return tileFragments;
 	}
 
-	public static void transform(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b, Chooser chooser) {
+	public static boolean exchangeSquares(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b, Chooser chooser) {
 		
 		HashSet<Integer> tiles = new HashSet<Integer>(); tiles.add(a); tiles.add(b);
 		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, environment, tiles);
@@ -273,7 +273,9 @@ public class Pentomino {
 
 			List<Action> moves = getSwapActions(option, contacts);
 			Action.makeMoves(moves);
+			return true;
 		}
+		else return false;
 	}
 
 
