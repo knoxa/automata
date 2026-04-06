@@ -50,46 +50,51 @@ public class SquareObserver {
 	
 	public static Map<Square, Set<Sense>> sense(Map<Square, Integer[]> coordinates, Map<Integer, Map<Integer, Set<Square>>> layout) {
 		
-		// The "coordinates" and "layout" maps encode tiles laid out in a grid. There are assumed to be two tiles.
-		// Find squares in the first tile that are adjacent to squares that aren't in this tile (so are in the second tile).
+		// The "coordinates" and "layout" maps encode tiles laid out in a grid.
+		// Find squares in each tile that are adjacent to squares that aren't in the tile (so are in a different tile).
 	
-		// Return a map of observations made by each square in the first tile
+		// Return a map of observations made by each square
 		Map<Square, Set<Sense>> observations = new HashMap<>();
 			
 		// Partition the located squares to make tiles
 		Map<Integer, Set<Square>> partitions = Partitioner.partition(coordinates.keySet());
-		
-		// just work with the first tile (need to change this later?)
-		
-		Set<Square> tile = partitions.get(1);
-		
-		for ( Square square: tile ) {
+
+		for ( Integer partNo: partitions.keySet() ) {
 			
-			// Each square "looks" in all neighbouring directions.
-			// If a square is seen, that isn't part of the same tile, then add a Sense object to "observations". 
+			Set<Square> tile = partitions.get(partNo);
 			
-			Integer[] coords = coordinates.get(square);
-			
-			for ( Direction direction: Compass.compass ) {
+			for ( Square square: tile ) {
 				
-				Map<Integer, Set<Square>> row = layout.get(coords[1] + Compass.getOffsetY(direction));
+				// Each square "looks" in all neighbouring directions.
+				// If a square is seen, that isn't part of the same tile, then add a Sense object to "observations".
 				
-				if ( row != null ) {
+				Set<Sense> seenByThisTile = new HashSet<>();
+				
+				Integer[] coords = coordinates.get(square);
+				
+				for ( Direction direction: Compass.compass ) {
 					
-					Set<Square> locatedSquares = row.get(coords[0] + Compass.getOffsetX(direction));
+					Map<Integer, Set<Square>> row = layout.get(coords[1] + Compass.getOffsetY(direction));
 					
-					if ( locatedSquares != null ) {
+					if ( row != null ) {
 						
-						for ( Square sensed: locatedSquares ) {
+						Set<Square> locatedSquares = row.get(coords[0] + Compass.getOffsetX(direction));
+						
+						if ( locatedSquares != null ) {
 							
-							if ( !tile.contains(sensed) ) {
+							for ( Square sensed: locatedSquares ) {
 								
-								Sense sense = new Sense(direction, sensed);
-								Maps.addMapValue(observations, square, sense);
+								if ( !tile.contains(sensed) ) {
+									
+									Sense sense = new Sense(direction, sensed);
+									seenByThisTile.add(sense);
+								}
 							}
 						}
 					}
 				}
+				
+				observations.put(square, seenByThisTile);
 			}
 		}
 		
