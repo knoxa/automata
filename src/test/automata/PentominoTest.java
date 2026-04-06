@@ -34,6 +34,14 @@ import worlds.BoardManager;
 class PentominoTest {
 
 	@Test
+	void F() {
+
+		Set<Square> tile = PentominoMaker.getTileF();
+		PentominoType type = Pentomino.identifyPentomino(tile);
+		assertEquals(PentominoType.F, type);
+	}
+
+	@Test
 	void P() {
 
 		Set<Square> tile = PentominoMaker.getTileP();
@@ -222,7 +230,7 @@ class PentominoTest {
 		// random mutation (with seed = 2) - creates [P, Z]
 		Integer tileP = pentominoes.get(PentominoType.P).iterator().next();
 		Integer tileT = pentominoes.get(PentominoType.T).iterator().next();
-		Pentomino.transform(partitionMap, environment, tileP, tileT, new Chooser(2));
+		Pentomino.exchangeSquares(partitionMap, environment, tileP, tileT, new Chooser(2));
 		
 		partitionMap = Partitioner.partition(board.getSquares());
 		pentominoes = Pentomino.getPentominoes(partitionMap);

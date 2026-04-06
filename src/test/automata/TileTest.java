@@ -183,9 +183,9 @@ public class TileTest {
 		Tile.position(square5, 0, 0, coordinates, positions);
 		Tile.position(square2, 2, 1, coordinates, positions);
 		
-		// square1 should now have square6 west and square4 north; square3 should have square4 west
+		// square1 should now have square6 west and square4 north; square3 should have square4 west - 4 observations in total
 		Map<Square, Set<Sense>> observations = SquareObserver.sense(coordinates, positions);
-		assertEquals(2, observations.keySet().size());
+		assertEquals(4, observations.keySet().size());
 		Set<Sense> sensed = observations.get(square1);
 		assertEquals(2, sensed.size());
 		Set<Square> sensedSquares = new HashSet<Square>();
