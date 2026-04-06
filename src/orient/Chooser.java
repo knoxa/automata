@@ -31,7 +31,7 @@ public class Chooser {
 
 	public <T> T randomFromList(List<T> candidates) {
 		
-		T selected = (candidates.size() > 1) ? candidates.get(random.nextInt(candidates.size())) : candidates.get(0);
+		T selected = (candidates.size() > 1) ? candidates.get(random.nextInt(candidates.size() * 1000) % candidates.size()) : candidates.get(0);
 		return selected;
 	}
 
