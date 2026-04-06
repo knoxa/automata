@@ -9,13 +9,31 @@ import orient.Partitioner;
 public class PentominoMaker {
 
 
+	public static Set<Square> getTileF() {
+		
+		Square square1 = new Square(); square1.setLabel("af");
+		Square square2 = new Square(); square2.setLabel("bf");
+		Square square3 = new Square(); square3.setLabel("cf");
+		Square square4 = new Square(); square4.setLabel("df");
+		Square square5 = new Square(); square5.setLabel("ef");
+		
+		Tile.attach(square1, Direction.EAST,  square2);
+		Tile.attach(square2, Direction.SOUTH,  square3);
+		Tile.attach(square3, Direction.EAST, square4);
+		Tile.attach(square3, Direction.SOUTH, square5);
+
+		return Partitioner.getTileContaining(square1);
+	}
+
+	
+
 	public static Set<Square> getTileP() {
 		
-		Square square1 = new Square(); square1.setLabel("(0,0)");
-		Square square2 = new Square(); square2.setLabel("(0,1)");
-		Square square3 = new Square(); square3.setLabel("(0,2)");
-		Square square4 = new Square(); square4.setLabel("(1,0)");
-		Square square5 = new Square(); square5.setLabel("(1,1)");
+		Square square1 = new Square(); square1.setLabel("ap");
+		Square square2 = new Square(); square2.setLabel("bp");
+		Square square3 = new Square(); square3.setLabel("cp");
+		Square square4 = new Square(); square4.setLabel("dp");
+		Square square5 = new Square(); square5.setLabel("ep");
 		
 		Tile.attach(square1, Direction.EAST,  square2);
 		Tile.attach(square2, Direction.EAST,  square3);
@@ -28,11 +46,11 @@ public class PentominoMaker {
 	
 	public static Set<Square> getTileU() {
 			
-		Square square1 = new Square(); square1.setLabel("(3,0)");
-		Square square2 = new Square(); square2.setLabel("(4,0)");
-		Square square3 = new Square(); square3.setLabel("(4,1)");
-		Square square4 = new Square(); square4.setLabel("(4,2)");
-		Square square5 = new Square(); square5.setLabel("(3,2)");
+		Square square1 = new Square(); square1.setLabel("au");
+		Square square2 = new Square(); square2.setLabel("bu");
+		Square square3 = new Square(); square3.setLabel("cu");
+		Square square4 = new Square(); square4.setLabel("du");
+		Square square5 = new Square(); square5.setLabel("eu");
 		
 		Tile.attach(square1, Direction.EAST, square2);
 		Tile.attach(square2, Direction.SOUTH, square3);
@@ -79,11 +97,11 @@ public class PentominoMaker {
 	
 	public static Set<Square> getTileZ() {
 				
-		Square square1 = new Square(); square1.setLabel("(0,0)");
-		Square square2 = new Square(); square2.setLabel("(0,1)");
-		Square square3 = new Square(); square3.setLabel("(1,1)");
-		Square square4 = new Square(); square4.setLabel("(1,2)");
-		Square square5 = new Square(); square5.setLabel("(2,2)");
+		Square square1 = new Square(); square1.setLabel("az");
+		Square square2 = new Square(); square2.setLabel("bz");
+		Square square3 = new Square(); square3.setLabel("cz");
+		Square square4 = new Square(); square4.setLabel("dz");
+		Square square5 = new Square(); square5.setLabel("ez");
 		
 		Tile.attach(square1, Direction.SOUTH, square2);
 		Tile.attach(square2, Direction.EAST, square3);
