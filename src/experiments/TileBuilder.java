@@ -45,7 +45,7 @@ public class TileBuilder {
 
 		Board board = new Board(6,10);		
 		
-		Chooser chooser = new Chooser(6);
+		Chooser chooser = new Chooser(9);
 			
 		for ( int trial = 0; trial < 50000; trial++ ) {
 			
@@ -57,7 +57,7 @@ public class TileBuilder {
 			Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
 			System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
 			System.out.println("---");
-			if ( pentominoes.keySet().size() > 11 ) {
+			if ( pentominoes.keySet().size() > 9 ) {
 				
 				Set<PentominoType> missing = EnumSet.allOf(PentominoType.class);missing.removeAll(pentominoes.keySet());
 				System.out.println("missing: " + missing);
