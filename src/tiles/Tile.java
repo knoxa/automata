@@ -301,4 +301,22 @@ public class Tile {
 		return detachableSquares;
 	}
 
+	
+	public static void transform(Set<Square> tile, Map<Direction, Direction> transform) {
+		
+		for ( Square square: tile ) {
+			
+			Map<Direction, Square> map = square.getNeighbourMap();
+			Map<Direction, Square> newMap = new HashMap<>();
+			
+			for ( Direction direction: map.keySet() ) {
+				
+				Square neighbour = map.get(direction);
+				square.clearNeighbour(direction);
+				newMap.put(transform.get(direction), neighbour);
+			}
+			
+			for ( Direction newDirection: newMap.keySet() )  square.setNeighbour(newDirection, newMap.get(newDirection));	
+		}
+	}
 }
