@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,15 +13,18 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
+import act.Action;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
 import observe.BoardObserver;
 import observe.SquareObserver;
-import orient.Chooser;
 import orient.Partitioner;
 import tiles.Pentomino;
 import tiles.PentominoType;
@@ -33,9 +37,10 @@ import xslt.Pipeline;
 
 public class SolutionMap {
 
-	public static void main(String[] args) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, TransformerException {
 
-		Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/automata/experiments/solution12.xml"));
+		Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/automata/experiments/solution34.xml"));
+		System.out.println(BoardManager.identifySolution(board.getGrid()));
 		
 		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
 		Map<Square, Set<Sense>> environment = BoardObserver.lookAbout(board);
@@ -49,41 +54,7 @@ public class SolutionMap {
 		System.out.println("---------");
 		System.out.println(filterGraph(graph, partitionMap,environment));
 		
-		Set<Square> tileA = partitionMap.get(2);
-		Set<Square> tileB = partitionMap.get(12);
-		Set<Square> locality = new HashSet<Square>();
-		locality.addAll(tileA); locality.addAll(tileB);
-		Map<Square, Set<Sense>> localEnv = SquareObserver.restrictEnvironment(environment, locality);
-
-		Map<Square, Set<Sense>> sensed = SquareObserver.sensedByTile(localEnv, tileA);
-		Iterator<Square> iter = sensed.keySet().iterator();
-		Square a = iter.next();
-		while ( sensed.get(a).size() == 0 ) a = iter.next();
-		System.out.println(a);
-		System.out.println(sensed);
-		Sense sense = sensed.get(a).iterator().next();
-		
-		Map<Square, Square> newA = copy(tileA);
-		Map<Square, Square> newB = copy(tileB);
-		
-		Map<Square, Integer[]> coordinates = new HashMap<Square, Integer[]>();		
-		Map<Integer, Map<Integer, Set<Square>>> positions = new HashMap<>();
-
-		Tile.position(newA.get(a), 0, 0, coordinates, positions);	
-		Tile.position(newB.get(sense.getSquare()), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
-		
-		swap(coordinates, positions);
-
-		Pipeline p = new Pipeline();
-		
-		try {
-			p.setOutput(new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
-			Plane.serialize(coordinates, positions, p.getContentHandler());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		swap(partitionMap, environment, 4, 11);
 	}
 	
 	
@@ -132,7 +103,8 @@ public class SolutionMap {
 		
 		for ( Square original: copyMap.keySet() ) {
 			
-			Square copy = copyMap.get(original);			
+			Square copy = copyMap.get(original);
+			copy.setLabel(original.getLabel());
 			Map<Direction, Square> neighbourMap = original.getNeighbourMap();
 			
 			for ( Direction direction: neighbourMap.keySet() ) {
@@ -145,13 +117,76 @@ public class SolutionMap {
 	}
 
 	
-	public static void swap(Map<Square, Integer[]> coordinates, Map<Integer, Map<Integer, Set<Square>>> positions) {
+	public static void swap(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b) throws ParserConfigurationException, SAXException, FileNotFoundException, TransformerException {
 		
-		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(coordinates.keySet());
-		Map<Square, Set<Sense>> environment = SquareObserver.sense(coordinates, positions);
-		Pentomino.exchangeSquares(partitionMap, environment, 1, 2, new Chooser(1));		
+		HashSet<Integer> tiles = new HashSet<Integer>(); tiles.add(a); tiles.add(b);
+		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, environment, tiles);
+		List<Set<Set<Square>>> possibleMoves = Pentomino.getPossibleSwaps(contacts);
+
+		Set<Square> tileA = partitionMap.get(a);
+		Set<Square> tileB = partitionMap.get(b);
+
+		Pipeline p = new Pipeline();
+
+		p.setOutput(new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
+		ContentHandler serializer = p.getContentHandler();
+		serializer.startDocument();
+		serializer.startElement("", "equivalent", "equivalent", new AttributesImpl());
+
+		Set<Square> temp = new HashSet<Square>();
+		temp.addAll(tileA);
+		temp.retainAll(contacts.keySet());
+		Square squareA = temp.iterator().next();
+		Sense sense = contacts.get(squareA).iterator().next();		
+
+		Map<Square, Integer[]> coordinates = new HashMap<Square, Integer[]>();		
+		Map<Integer, Map<Integer, Set<Square>>> positions = new HashMap<>();
+
+		Tile.position(squareA, 0, 0, coordinates, positions);	
+		Tile.position(sense.getSquare(), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
+		Plane.serialize(coordinates, positions, serializer);			
+		
+		for ( Set<Set<Square>> option: possibleMoves ) {
+			
+			coordinates = new HashMap<Square, Integer[]>();		
+			positions = new HashMap<>();
+
+			Map<Square, Square> map = new HashMap<>();
+			Map<Square, Square> newA = copy(tileA);
+			Map<Square, Square> newB = copy(tileB);
+			map.putAll(newA); map.putAll(newB);
+
+			Tile.position(map.get(squareA), 0, 0, coordinates, positions);	
+			Tile.position(map.get(sense.getSquare()), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
+
+			List<Action> moves = Pentomino.getSwapActions(option, contacts);
+			List<Action> copy = copyActions(moves, map); 
+			
+			Action.makeMoves(copy);
+			
+			Plane.serialize(coordinates, positions, serializer);			
+		}
+		
+		serializer.endElement("", "equivalent", "equivalent");
+		serializer.endDocument();
+
 	}
 	
+	
+	public static List<Action> copyActions(List<Action> actions, Map<Square, Square> map) {
+		
+		List<Action> copy = new ArrayList<>();
+		
+		for ( Action action: actions ) {
+			
+			Sense sense = action.getSense();
+			Sense newSense = new Sense(sense.getDirection(), map.get(sense.getSquare()));
+			Action newAction = new Action(map.get(action.getActor()), action.getAct(), newSense);
+			copy.add(newAction);
+		}
+		
+		return copy;
+	}
 	
 	public static void isolate(Set<Square> tileA, Set<Square> tileB, Map<Square, Set<Sense>> environment) {
 		
@@ -162,8 +197,6 @@ public class SolutionMap {
 		Iterator<Square> iter = sensed.keySet().iterator();
 		Square a = iter.next();
 		while ( sensed.get(a).size() == 0 ) a = iter.next();
-		System.out.println(a);
-		System.out.println(sensed);
 		Sense sense = sensed.get(a).iterator().next();
 		
 		Map<Square, Square> newA = copy(tileA);
@@ -175,4 +208,5 @@ public class SolutionMap {
 		Tile.position(newA.get(a), 0, 0, coordinates, positions);	
 		Tile.position(newB.get(sense.getSquare()), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
 	}
+
 }

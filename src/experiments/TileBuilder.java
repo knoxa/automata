@@ -57,7 +57,7 @@ public class TileBuilder {
 			Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
 			System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
 			System.out.println("---");
-			if ( pentominoes.keySet().size() > 9 ) {
+			if ( pentominoes.keySet().size() > 11 ) {
 				
 				Set<PentominoType> missing = EnumSet.allOf(PentominoType.class);missing.removeAll(pentominoes.keySet());
 				System.out.println("missing: " + missing);
@@ -71,106 +71,6 @@ public class TileBuilder {
 		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
 		BoardManager.reportPartitions(partitionMap, board);
 
-/*
-		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
-		Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-
-		Map<Integer, Set<Integer>> graph = Partitioner.getPartitionGraph(partitionMap, environment);
-		System.out.println(graph);
-		
-		Square displaced = TileAction.displaceSquare(partitionMap.get(10), environment, chooser, new HashSet<Square>());
-		Pentomino.chaseTheAce(displaced, partitionMap.get(10), environment, new Chooser(5));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		displaced = TileAction.displaceSquare(partitionMap.get(12), environment, chooser, new HashSet<Square>());
-		Pentomino.chaseTheAce(displaced, partitionMap.get(12), environment, new Chooser(1));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Pentomino.mutate(partitionMap, environment, 1, 4, new Chooser(1));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Pentomino.mutate(partitionMap, environment, 1, 4, new Chooser(5));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-
-		Set<Square> locality = new HashSet<Square>();
-		locality.addAll(partitionMap.get(2)); locality.addAll(partitionMap.get(3)); locality.addAll(partitionMap.get(6)); locality.addAll(partitionMap.get(7));
-		Map<Square, Set<Sense>> localEnv = SquareObserver.restrictEnvironment(environment, locality);
-		
-		displaced = TileAction.displaceSquare(partitionMap.get(6), localEnv, chooser, new HashSet<Square>());
-		Pentomino.chaseTheAce(displaced, partitionMap.get(6), localEnv, new Chooser(4));	
-		Pentomino.formPentominoes(board, chooser, localEnv);
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Chooser cx = new Chooser(101); cx.getRandom().nextInt();
-		Pentomino.mutate(partitionMap, environment, 2, 3, cx);
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Pentomino.mutate(partitionMap, environment, 6, 7, new Chooser(2));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		cx = new Chooser(103); cx.getRandom().nextInt(); cx.getRandom().nextInt();
-		Pentomino.mutate(partitionMap, environment, 6, 3, cx);
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Pentomino.mutate(partitionMap, environment, 6, 7, new Chooser(3));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-		
-		Pentomino.mutate(partitionMap, environment, 6, 3, new Chooser(3));
-		
-		partitionMap = Partitioner.partition(board.getSquares());
-		pentominoes = Pentomino.getPentominoes(partitionMap);
-		System.out.println(pentominoes);
-		System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
-		BoardManager.reportPartitions(partitionMap, board);
-*/
 		Pipeline p = new Pipeline();
 
 		try {

@@ -23,7 +23,7 @@ public class RandomPentominoes {
 		Board board = new Board(6,10);
 		Map<Square, Set<Sense>> environment = BoardObserver.lookAbout(board);
 		
-		for ( int trial = 2000; trial < 10000; trial++ ) {
+		for ( int trial = 1; trial <= 10000; trial++ ) {
 			
 			board.clear();
 			Chooser chooser = new Chooser(trial);
@@ -36,7 +36,7 @@ public class RandomPentominoes {
 			Map<PentominoType, Set<Integer>> pentominoes = Pentomino.getPentominoes(partitionMap);
 			System.out.println("distinct pentominoes: " + pentominoes.keySet().size());
 			System.out.println("---");
-			if ( pentominoes.keySet().size() > 9 ) break;
+			if ( pentominoes.keySet().size() > 11 ) break;
 		}
 			
 		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
