@@ -18,7 +18,7 @@ public class Plane {
 	
 	public static void serialize(Map<Square, Integer[]> coordinates, Map<Integer, Map<Integer, Set<Square>>> positions, ContentHandler ch) throws SAXException {
 		
-		ch.startDocument();
+	//	ch.startDocument();
 		
 		int xMin = Integer.MAX_VALUE, yMin = Integer.MAX_VALUE, xMax = Integer.MIN_VALUE, yMax = Integer.MIN_VALUE;
 
@@ -32,6 +32,8 @@ public class Plane {
 		}
 		
 		AttributesImpl attr = new AttributesImpl();
+		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(xMax - xMin));
+		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(yMax - yMin));
 		ch.startElement("", "plane", "plane", attr);
 		
 		for ( int h = 0; h <= yMax - yMin; h++ ) {
@@ -40,7 +42,7 @@ public class Plane {
 			
 			for ( int w = 0; w <= xMax - xMin; w++ ) {
 							
-				Set<Square> squares = row.get(w + xMin);
+				Set<Square> squares = row == null ? null : row.get(w + xMin);
 				
 				if ( squares != null ) {
 					
@@ -74,7 +76,7 @@ public class Plane {
 		}
 		
 		ch.endElement("", "plane", "plane");
-		ch.endDocument();
+	//	ch.endDocument();
 	}
 
 
