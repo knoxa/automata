@@ -15,7 +15,11 @@
 	</target>
 
 	<target name="test">
-		<xslt in="../experiments/nearly-solution.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+		<xslt in="../experiments/solution34.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+	</target>
+
+	<target name="plane">
+		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="plane.xsl" force="true"/>
 	</target>
 
 </project>
