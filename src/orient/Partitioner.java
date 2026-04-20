@@ -6,12 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import orient.State;
-import worlds.Compass;
 import cakes.category.Maps;
 import cells.Direction;
 import cells.Sense;
 import cells.Square;
+import worlds.Compass;
 
 public class Partitioner {
 

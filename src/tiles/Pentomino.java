@@ -162,33 +162,6 @@ public class Pentomino {
 		
 		return moves;
 	}
-	
-	
-	public static int formPentominoes2(Board board, Chooser chooser, Map<Square, Set<Sense>> environment) {
-		
-		int moves = 0;
-		
-		for ( int i = 0; i < MAX_ITERATIONS; i++ ) {
-			
-			// partition the board into tiles and get the tile sizes
-			Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
-			Map<Integer, Set<Integer>> sizeMap = Partitioner.collectBySize(partitionMap);
-
-			// finished if we only have pentominoes
-			if ( Pentomino.haveOnlyPentominoes(partitionMap) )  break;
-			
-			List<Integer> sizes = new ArrayList<Integer>();
-			sizes.addAll(sizeMap.keySet());
-
-			Integer p = chooser.randomSmallestPartion(sizeMap, sizes);
-			TileAction.anySquareDefects(partitionMap.get(p), environment, chooser);
-
-			moves++;
-		}
-		
-		
-		return moves;
-	}
 
 	
 	public static Map<Integer, Set<Set<Square>>> getDetachableFragments(Map<Square, Set<Sense>> contacts) {
@@ -406,16 +379,13 @@ public class Pentomino {
 			
 			// work out where to connect the displaced square
 			Map<Integer, Set<Integer>> sizes = Partitioner.collectPartitionSizes(possibleTiles);
-			System.out.println("step: " + steps + " - " + sizes);
 			
 			if ( sizes.get(4) != null ) { 
 				
 				// connect to a tile of size 4 if there is one
 				Integer tileOfSize4 = chooser.randomFromSet(sizes.get(4));
-				System.out.println("444444444444444444444444444444444444444 " );
 				Set<Square> candidates = possibleConnections.keySet();
 				candidates.retainAll(possibleTiles.get(tileOfSize4));
-				System.out.println(candidates);
 				Square target = chooser.randomFromSet(candidates);
 				
 				List<Action> actions = new ArrayList<Action>();
@@ -433,7 +403,6 @@ public class Pentomino {
 				// displace a square from the target tile that isn't the one where the displaced square will attach
 				Set<Square> except = new HashSet<Square>(); except.add(choice);
 				currentTile = Partitioner.getTileContaining(choice);
-				System.out.println("aa " + currentTile);
 				Square next = TileAction.displaceSquare(currentTile, environment, chooser, except);
 				
 				if ( next != null ) {
@@ -464,13 +433,8 @@ public class Pentomino {
 	public static Map<Integer, Set<Square>> selectCandidateTargetTiles(Square square, Map<Square, Set<Sense>> environment) {
 		
 		Set<Sense> visible = environment.get(square);
-		Map<Square, Sense> map = mapSquareToSense(visible);
-		
-		Map<Integer, Set<Square>> localTiles = Partitioner.partition(map.keySet());
-		Map<Integer, Integer> sizes = Partitioner.getPartitionSizes(localTiles);
-		System.out.println(Pentomino.getPentominoes(localTiles));
-		System.out.println("xxxx " + sizes);
-		
+		Map<Square, Sense> map = mapSquareToSense(visible);		
+		Map<Integer, Set<Square>> localTiles = Partitioner.partition(map.keySet());		
 		return localTiles;		
 	}
 	
@@ -538,5 +502,4 @@ public class Pentomino {
 		
 		return detached;
 	}
-
 }

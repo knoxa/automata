@@ -3,6 +3,9 @@ package worlds;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ public class BoardManager {
 		Map<Square, Set<Integer>> reverse = Maps.invertMap(partitionMap);
 		
 		Square[][] grid = board.getGrid();
+		String identifier = identifySolution(grid);
 		
 		ch.startDocument();
 		
@@ -39,7 +43,11 @@ public class BoardManager {
 		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(board.getWidth()));
 		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(board.getHeight()));
 		ch.startElement("", "board", "board", attr);
-		
+
+		ch.startElement("", "identifier", "identifier", new AttributesImpl());
+		ch.characters(identifier.toCharArray(), 0, identifier.length());
+		ch.endElement("", "identifier", "identifier");
+
 		for ( int h = 0; h < board.getHeight(); h++ ) {
 			
 			for ( int w = 0; w < board.getWidth(); w++ ) {
@@ -135,6 +143,36 @@ public class BoardManager {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+
+	public static String identifySolution(Square[][] grid) {
+		
+		int rows = grid.length;
+		int cols = grid[0].length;
+		
+		StringBuffer bufferA = new StringBuffer();
+		StringBuffer bufferB = new StringBuffer();
+		StringBuffer bufferC = new StringBuffer();
+		StringBuffer bufferD = new StringBuffer();
+		
+		for ( int col = 0; col < cols; col++ ) {
+			
+			for ( int row = 0; row < rows; row++ ) {
+				
+				bufferA.append(Pentomino.identifyPentomino(Partitioner.getTileContaining(grid[row][col])));
+				bufferB.append(Pentomino.identifyPentomino(Partitioner.getTileContaining(grid[row][cols - col - 1])));
+				bufferC.append(Pentomino.identifyPentomino(Partitioner.getTileContaining(grid[rows - row - 1][col])));
+				bufferD.append(Pentomino.identifyPentomino(Partitioner.getTileContaining(grid[rows - row - 1][cols - col - 1])));
+			}
+			
+			bufferA.append(' '); bufferB.append(' '); bufferC.append(' '); bufferD.append(' ');
+		}
+		
+		List<String> list = new ArrayList<>();
+		list.add(bufferA.toString()); list.add(bufferB.toString()); list.add(bufferC.toString()); list.add(bufferD.toString());
+		Collections.sort(list);
+		return list.get(0).trim();
 	}
 	
 }
