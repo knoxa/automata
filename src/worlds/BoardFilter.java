@@ -41,6 +41,10 @@ public class BoardFilter extends BaseFilter {
 			currentSquare = grid[Integer.parseInt(row)][Integer.parseInt(col)];
 			if ( label != null )  currentSquare.setLabel(label);
 		}
+		else if ( qname.equals("identifier") ) {
+			
+			// ignore the identifer 
+		}
 		else {
 			
 			// a direction
