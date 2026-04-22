@@ -32,8 +32,8 @@ public class Plane {
 		}
 		
 		AttributesImpl attr = new AttributesImpl();
-		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(xMax - xMin));
-		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(yMax - yMin));
+		attr.addAttribute("", "width", " width",  "Integer",  String.valueOf(xMax - xMin + 1));
+		attr.addAttribute("", "height",  "height",  "Integer",  String.valueOf(yMax - yMin + 1));
 		ch.startElement("", "plane", "plane", attr);
 		
 		for ( int h = 0; h <= yMax - yMin; h++ ) {
