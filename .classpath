@@ -15,5 +15,6 @@
 			<attribute name="maven.scope" value="compile"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="/Dover"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
