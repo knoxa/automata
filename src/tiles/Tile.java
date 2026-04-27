@@ -319,4 +319,33 @@ public class Tile {
 			for ( Direction newDirection: newMap.keySet() )  square.setNeighbour(newDirection, newMap.get(newDirection));	
 		}
 	}
+	
+
+	public static Map<Square, Square> copy(Set<Square> squares) {
+		
+		// Copy the squares in a tile.
+		// The result is a Map of 'old square' to 'new square'.
+		
+		Map<Square, Square> copyMap = new HashMap<>();
+		
+		// make the new squares
+		for ( Square square: squares )  copyMap.put(square, new Square());
+		
+		// copy the properties from 'old' to 'new'
+		for ( Square original: copyMap.keySet() ) {
+			
+			Square copy = copyMap.get(original);
+			copy.setLabel(original.getLabel());
+			Map<Direction, Square> neighbourMap = original.getNeighbourMap();
+			
+			// copy neighbour relations from 'old' to 'new'
+			for ( Direction direction: neighbourMap.keySet() ) {
+				
+				copy.setNeighbour(direction, copyMap.get(neighbourMap.get(direction)));
+			}
+		}
+		
+		return copyMap;
+	}
+
 }
