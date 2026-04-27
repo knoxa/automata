@@ -14,8 +14,12 @@
 		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
 	</target>
 
+	<target name="board-new">
+		<xslt in="../experiments/new.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+	</target>
+
 	<target name="test">
-		<xslt in="../experiments/solution34.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+		<xslt in="/D:/GitHub/knoxa.github.io/pentominoes/solutions/6x10/60.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
 	</target>
 
 	<target name="plane">

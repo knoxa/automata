@@ -4,7 +4,7 @@
 <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
 <xsl:template match="/">
-<svg viewBox="0 0 1200 800" preserveAspectRatio="xMinYMin meet">
+<svg viewBox="0 0 3600 2400" preserveAspectRatio="xMinYMin meet">
 
 <style type="text/css">
 
@@ -31,15 +31,26 @@ g {
 
 </style>
 
-
-<xsl:apply-templates select="//plane"/>
+<xsl:apply-templates select="//equivalent[1]">
+	<xsl:with-param name="xoffset" select="0"/>
+</xsl:apply-templates>
 
 </svg>
 </xsl:template>
 
+<xsl:template match="equivalent">
+<xsl:param name="xoffset"/>
+<g transform="translate({$xoffset}, 0)">
+	<xsl:apply-templates select="plane"/>
+</g>
+<xsl:apply-templates select="following-sibling::equivalent[1]">
+	<xsl:with-param name="xoffset" select="$xoffset + plane[1]/@width * 50 + 80"/>
+</xsl:apply-templates>
+</xsl:template>
+
 <xsl:template match="plane">
 
-<g transform="translate({50 + 220 * position()}, 100)">
+<g transform="translate(100, {@height * 50 * position() + (position()-1)*50})">
 	<xsl:apply-templates select="square"/>
 </g>
 
