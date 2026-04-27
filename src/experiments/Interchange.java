@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import act.Action;
 import cells.Sense;
 import cells.Square;
 import observe.BoardObserver;
 import orient.Chooser;
 import orient.Partitioner;
 import tiles.Pentomino;
+import tiles.PentominoMove;
 import tiles.PentominoType;
 import worlds.Board;
 import worlds.BoardManager;
@@ -30,18 +32,32 @@ public class Interchange {
 		// Could parameterise the board size, random number seed, max iterations to try, and output file.
 		// A degenerate solution will always be found in the first stage. A proper solution is not necessarily found in the second stage.
 		
+		// 6x10 (134), 4x15 (142), 5x12 (151)
 		Board board = new Board(5,12);
 		Map<Square, Set<Sense>> environment = BoardObserver.lookAbout(board);
-		Chooser chooser = new Chooser(112);
+		Chooser chooser = new Chooser(151);
 
 		int moves = Pentomino.formPentominoes(board, chooser, environment);
 		System.out.println("pentominoes formed in " + moves + " moves");
 				
-		 for ( int trial = 1; trial <= 20000; trial++ ) {
+		 for ( int trial = 1; trial <= 10000; trial++ ) {
 			 
 			Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
 			 if ( !randomSwap(partitionMap, environment, chooser) ) break;
 			 System.out.println(trial + " exchanges");
+			 
+			 // see if we're close to a solution ...
+			 Set<PentominoMove> solution = LookAhead.lookAt(board);
+			 
+			 if ( solution != null ) {
+				 
+				 // go straight to the nearby solution and stop
+				 for ( PentominoMove move: solution ) {
+
+					Action.makeMoves(move.getActions());
+				}
+				break;
+			 }
 		 }
 
 		Pipeline p = new Pipeline();
@@ -75,7 +91,7 @@ public class Interchange {
 		System.out.println(graph);
 		
 		// filter graph to just keep edges between tiles that can legally exchange squares.
-		Map<Integer, Set<Integer>> filtered = SolutionMap.filterGraph(graph, partitionMap, environment);
+		Map<Integer, Set<Integer>> filtered = LookAhead.filterGraph(graph, partitionMap, environment);
 		
 		// choose the first of a pair of tiles to exchange ...
 		List<Integer> fromOptions = new ArrayList<>();
