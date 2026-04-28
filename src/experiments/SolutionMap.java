@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,15 +21,20 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import act.Action;
-import cells.Direction;
+import argumentation.engine.Backtrack;
+import argumentation.engine.Label;
 import cells.Sense;
 import cells.Square;
 import observe.BoardObserver;
 import observe.SquareObserver;
 import orient.Partitioner;
 import tiles.Pentomino;
+import tiles.PentominoMove;
 import tiles.PentominoType;
 import tiles.Tile;
+import uk.ac.kent.dover.fastGraph.EdgeStructure;
+import uk.ac.kent.dover.fastGraph.FastGraph;
+import uk.ac.kent.dover.fastGraph.NodeStructure;
 import worlds.Board;
 import worlds.BoardManager;
 import worlds.Compass;
@@ -39,7 +45,9 @@ public class SolutionMap {
 
 	public static void main(String[] args) throws FileNotFoundException, ParserConfigurationException, SAXException, IOException, TransformerException {
 
-		Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/automata/experiments/solution34.xml"));
+		//Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/knoxa.github.io/pentominoes/solutions/6x10/60.xml"));
+		Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/knoxa.github.io/pentominoes/solutions/4x15/213.xml"));
+		//Board board = BoardManager.loadFromXml(new FileInputStream("experiments/out.xml"));
 		System.out.println(BoardManager.identifySolution(board.getGrid()));
 		
 		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
@@ -52,72 +60,132 @@ public class SolutionMap {
 		System.out.println(graph);
 		
 		System.out.println("---------");
-		System.out.println(filterGraph(graph, partitionMap,environment));
 		
-		swap(partitionMap, environment, 4, 11);
-	}
-	
-	
-	public static int numberofTransforms(Integer a, Integer b, Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment) {
+		Set<PentominoType> fromOptions = new HashSet<>();
 		
-		HashSet<Integer> tiles = new HashSet<Integer>();
-		tiles.add(a); tiles.add(b);
-		
-		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, environment, tiles);
-		List<Set<Set<Square>>> possibleMoves = Pentomino.getPossibleSwaps(contacts);
-		return possibleMoves.size();
-	}
-	
-	
-	public static Map<Integer, Set<Integer>> filterGraph(Map<Integer, Set<Integer>> graph, Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment) {
-		
-		Map<Integer, Set<Integer>> filtered = new HashMap<>();
-		
-		for ( Integer from: graph.keySet() ) {
+		for ( PentominoType type: pentominoes.keySet()) {
 			
-			Set<Integer> filteredLinks = new HashSet<>();
-			Set<Integer> links = graph.get(from);
+			// list all the tiles whose type appears more than once.
+			if ( pentominoes.get(type).size() > 1 )  fromOptions.add(type);
+		}
+	
+		Map<Integer, Set<Integer>> potentialSwaps = LookAhead.filterGraph(graph, partitionMap,environment);
+		System.out.println(potentialSwaps);
+		
+		///
+		List<Set<Integer>> pairs = new ArrayList<>();
+		
+		for ( Integer from: potentialSwaps.keySet() ) {
 			
-			for ( Integer to: links ) {
+			for ( Integer to: potentialSwaps.get(from) ) {
 				
-				int transforms = numberofTransforms(from, to, partitionMap, environment);
-				//if ( from < to ) System.out.println(from + "," + to + ": " + transforms);
-				
-				if ( transforms > 0 ) {
+				if ( from < to )  {
 					
-					filteredLinks.add(to);
+					Set<Integer> pair = new HashSet<>();
+					pair.add(from); pair.add(to);
+					pairs.add(pair);
 				}
 			}
-			
-			filtered.put(from, filteredLinks);
 		}
 		
-		return filtered; 
-	}
-
-	
-	public static Map<Square, Square> copy(Set<Square> squares) {
-		
-		Map<Square, Square> copyMap = new HashMap<>();
-		for ( Square square: squares )  copyMap.put(square, new Square());
-		
-		for ( Square original: copyMap.keySet() ) {
-			
-			Square copy = copyMap.get(original);
-			copy.setLabel(original.getLabel());
-			Map<Direction, Square> neighbourMap = original.getNeighbourMap();
-			
-			for ( Direction direction: neighbourMap.keySet() ) {
+		System.out.println(pairs);
 				
-				copy.setNeighbour(direction, copyMap.get(neighbourMap.get(direction)));
+		///
+		Map<Set<Integer>, Set<Set<Integer>>> argument = new HashMap<>();
+		
+		for ( Set<Integer> pair: pairs ) {
+			
+			Set<Set<Integer>> attacks = new HashSet<>();
+			
+			for ( Set<Integer> swap: pairs ) {
+				
+				Set<Integer> temp = new HashSet<>();
+				temp.addAll(swap);
+				
+				temp.removeAll(pair);
+				//System.out.println(pair + " -- " + swap + " -- " + temp);
+				if ( temp.size() == 1 ) attacks.add(swap);			
+			}
+			
+			argument.put(pair, attacks);
+		}
+		///
+		
+		//System.out.println("###\n" + argument);
+		System.out.println("###\n");
+		
+		
+		List<NodeStructure> nodes = new ArrayList<NodeStructure>();
+		List<EdgeStructure> edges = new ArrayList<EdgeStructure>();
+		
+		Map<Set<Integer>, Integer> nodeMap = new HashMap<>();
+		Map<Integer, Set<Integer>> pairMap = new HashMap<>();
+		int nodeNum = 0;
+		
+		for ( Set<Integer> pair: argument.keySet() ) {
+			
+			String label = pair.toString();
+			nodeMap.put(pair, nodeNum);
+			pairMap.put(nodeNum, pair);
+			nodes.add(new NodeStructure(nodeNum++, label, 0, (byte) 0, (byte) 0));
+		}
+
+		for ( Set<Integer> pair: argument.keySet() ) {
+			
+			for ( Set<Integer> notAcceptable: argument.get(pair) ) {
+				
+				int from = nodeMap.get(pair); int to = nodeMap.get(notAcceptable);
+				edges.add(new EdgeStructure(0, "", 0, (byte) 0, (byte) 0, from, to));
+			}
+		}
+
+		FastGraph framework = FastGraph.structureFactory("PENTOMINO", (byte) 0, nodes, edges, true);
+
+
+		Label[] labels = new Label[framework.getNumberOfNodes()];
+	//	System.out.println(framework);
+		Arrays.fill(labels, Label.BLANK);
+		Set<Set<Integer>> extensions = new HashSet<Set<Integer>>();
+
+		Backtrack.admissible(framework, labels, extensions);
+       
+		System.out.println(extensions.size() + " extensions");
+		
+		Pipeline p = new Pipeline();
+
+		p.setOutput(new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
+		ContentHandler serializer = p.getContentHandler();
+		serializer.startDocument();
+		serializer.startElement("", "analysis", "analysis", new AttributesImpl());
+		
+		Map<Set<Integer>, List<PentominoType>> inputMap = new HashMap<>();
+		Map<Set<Integer>, List<PentominoMove>> outputMap = new HashMap<>();
+
+		for ( Integer from: potentialSwaps.keySet() ) {
+			
+			for ( Integer to: potentialSwaps.get(from) ) {
+				
+				if ( from < to )  {
+					
+					List<PentominoMove> options = swap(partitionMap, environment, from, to, serializer);
+					Set<Integer> pair = new HashSet<>(); pair.add(from); pair.add(to);
+					List<PentominoType> inputTypes = new ArrayList<>();
+					inputTypes.add(Pentomino.identifyPentomino(partitionMap.get(from))); inputTypes.add(Pentomino.identifyPentomino(partitionMap.get(to)));
+					inputMap.put(pair, inputTypes);
+					outputMap.put(pair, options);
+				}
 			}
 		}
 		
-		return copyMap;
+		serializer.endElement("", "analysis", "analysis");
+		serializer.endDocument();
+		
 	}
 
 	
-	public static void swap(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b) throws ParserConfigurationException, SAXException, FileNotFoundException, TransformerException {
+	public static List<PentominoMove> swap(Map<Integer, Set<Square>> partitionMap, Map<Square, Set<Sense>> environment, int a, int b, ContentHandler serializer) throws ParserConfigurationException, SAXException, FileNotFoundException, TransformerException {
+		
+		List<PentominoMove> possibileSwaps = new ArrayList<PentominoMove>();
 		
 		HashSet<Integer> tiles = new HashSet<Integer>(); tiles.add(a); tiles.add(b);
 		Map<Square, Set<Sense>> contacts = SquareObserver.sense(partitionMap, environment, tiles);
@@ -126,11 +194,11 @@ public class SolutionMap {
 		Set<Square> tileA = partitionMap.get(a);
 		Set<Square> tileB = partitionMap.get(b);
 
-		Pipeline p = new Pipeline();
+		List<PentominoType> inputTypes = new ArrayList<>();
+		inputTypes.add(Pentomino.identifyPentomino(tileA));
+		inputTypes.add(Pentomino.identifyPentomino(tileB));
+		Set<Integer> pair = new HashSet<>(); pair.add(a); pair.add(b);
 
-		p.setOutput(new FileOutputStream("/D:/GitHub/automata/experiments/out.xml"));
-		ContentHandler serializer = p.getContentHandler();
-		serializer.startDocument();
 		serializer.startElement("", "equivalent", "equivalent", new AttributesImpl());
 
 		Set<Square> temp = new HashSet<Square>();
@@ -144,7 +212,9 @@ public class SolutionMap {
 
 		Tile.position(squareA, 0, 0, coordinates, positions);	
 		Tile.position(sense.getSquare(), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
-		Plane.serialize(coordinates, positions, serializer);			
+		Plane.serialize(coordinates, positions, serializer);
+		
+		Set<List<PentominoType>> allOutputTypes = new HashSet<>();
 		
 		for ( Set<Set<Square>> option: possibleMoves ) {
 			
@@ -152,43 +222,42 @@ public class SolutionMap {
 			positions = new HashMap<>();
 
 			Map<Square, Square> map = new HashMap<>();
-			Map<Square, Square> newA = copy(tileA);
-			Map<Square, Square> newB = copy(tileB);
+			Map<Square, Square> newA = Tile.copy(tileA);
+			Map<Square, Square> newB = Tile.copy(tileB);
 			map.putAll(newA); map.putAll(newB);
 
 			Tile.position(map.get(squareA), 0, 0, coordinates, positions);	
 			Tile.position(map.get(sense.getSquare()), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
 
 			List<Action> moves = Pentomino.getSwapActions(option, contacts);
-			List<Action> copy = copyActions(moves, map); 
+			List<Action> copy = LookAhead.copyActions(moves, map); 
 			
 			Action.makeMoves(copy);
 			
-			Plane.serialize(coordinates, positions, serializer);			
+			Plane.serialize(coordinates, positions, serializer);
+			
+			Map<Integer, Set<Square>> newPartitions = Partitioner.partition(coordinates.keySet());
+			List<PentominoType> outputTypes = new ArrayList<>();
+			
+			for ( Integer tile: newPartitions.keySet() ) {
+				
+				outputTypes.add(Pentomino.identifyPentomino(newPartitions.get(tile)));
+			}
+			allOutputTypes.add(outputTypes);
+			
+			PentominoMove opt = new PentominoMove();
+			opt.setActions(moves);
+			opt.setResult(outputTypes);
+			possibileSwaps.add(opt);
 		}
 		
 		serializer.endElement("", "equivalent", "equivalent");
-		serializer.endDocument();
 
+		return possibileSwaps;
 	}
 	
 	
-	public static List<Action> copyActions(List<Action> actions, Map<Square, Square> map) {
-		
-		List<Action> copy = new ArrayList<>();
-		
-		for ( Action action: actions ) {
-			
-			Sense sense = action.getSense();
-			Sense newSense = new Sense(sense.getDirection(), map.get(sense.getSquare()));
-			Action newAction = new Action(map.get(action.getActor()), action.getAct(), newSense);
-			copy.add(newAction);
-		}
-		
-		return copy;
-	}
-	
-	public static void isolate(Set<Square> tileA, Set<Square> tileB, Map<Square, Set<Sense>> environment) {
+	private static void isolate(Set<Square> tileA, Set<Square> tileB, Map<Square, Set<Sense>> environment) {
 		
 		Set<Square> locality = new HashSet<Square>();
 		locality.addAll(tileA); locality.addAll(tileB);
@@ -199,8 +268,8 @@ public class SolutionMap {
 		while ( sensed.get(a).size() == 0 ) a = iter.next();
 		Sense sense = sensed.get(a).iterator().next();
 		
-		Map<Square, Square> newA = copy(tileA);
-		Map<Square, Square> newB = copy(tileB);
+		Map<Square, Square> newA = Tile.copy(tileA);
+		Map<Square, Square> newB = Tile.copy(tileB);
 		
 		Map<Square, Integer[]> coordinates = new HashMap<Square, Integer[]>();		
 		Map<Integer, Map<Integer, Set<Square>>> positions = new HashMap<>();
