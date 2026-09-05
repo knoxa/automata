@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -256,26 +255,4 @@ public class SolutionMap {
 		return possibileSwaps;
 	}
 	
-	
-	private static void isolate(Set<Square> tileA, Set<Square> tileB, Map<Square, Set<Sense>> environment) {
-		
-		Set<Square> locality = new HashSet<Square>();
-		locality.addAll(tileA); locality.addAll(tileB);
-		Map<Square, Set<Sense>> localEnv = SquareObserver.restrictEnvironment(environment, locality);
-		Map<Square, Set<Sense>> sensed = SquareObserver.sensedByTile(localEnv, tileA);
-		Iterator<Square> iter = sensed.keySet().iterator();
-		Square a = iter.next();
-		while ( sensed.get(a).size() == 0 ) a = iter.next();
-		Sense sense = sensed.get(a).iterator().next();
-		
-		Map<Square, Square> newA = Tile.copy(tileA);
-		Map<Square, Square> newB = Tile.copy(tileB);
-		
-		Map<Square, Integer[]> coordinates = new HashMap<Square, Integer[]>();		
-		Map<Integer, Map<Integer, Set<Square>>> positions = new HashMap<>();
-
-		Tile.position(newA.get(a), 0, 0, coordinates, positions);	
-		Tile.position(newB.get(sense.getSquare()), Compass.getOffsetX(sense.getDirection()), Compass.getOffsetY(sense.getDirection()), coordinates, positions);
-	}
-
 }

@@ -19,7 +19,6 @@ import tiles.PentominoMaker;
 import tiles.PentominoType;
 import tiles.Tile;
 import worlds.Board;
-import worlds.BoardManager;
 import worlds.Compass;
 import worlds.Plane;
 import xslt.Pipeline;
