@@ -20,6 +20,8 @@ public class SquareObserver {
 		
 		// look for squares that you can get to by going one step forward (in given direction), 
 		// then either left or right, then one step back.
+		
+		// need this now that Compass has 8 points?
 
 		Set<Direction> orthogonal = Compass.getOrthogonalDirections(forward);
 		Direction back = Compass.getReturnDirection(forward);
@@ -74,24 +76,27 @@ public class SquareObserver {
 				
 				for ( Direction direction: Compass.compass ) {
 					
-					Map<Integer, Set<Square>> row = layout.get(coords[1] + Compass.getOffsetY(direction));
-					
-					if ( row != null ) {
+					if ( Compass.isCardinal(direction)) {
 						
-						Set<Square> locatedSquares = row.get(coords[0] + Compass.getOffsetX(direction));
+						Map<Integer, Set<Square>> row = layout.get(coords[1] + Compass.getOffsetY(direction));
 						
-						if ( locatedSquares != null ) {
+						if ( row != null ) {
 							
-							for ( Square sensed: locatedSquares ) {
+							Set<Square> locatedSquares = row.get(coords[0] + Compass.getOffsetX(direction));
+							
+							if ( locatedSquares != null ) {
 								
-								if ( !tile.contains(sensed) ) {
+								for ( Square sensed: locatedSquares ) {
 									
-									Sense sense = new Sense(direction, sensed);
-									seenByThisTile.add(sense);
+									if ( !tile.contains(sensed) ) {
+										
+										Sense sense = new Sense(direction, sensed);
+										seenByThisTile.add(sense);
+									}
 								}
 							}
 						}
-					}
+					}					
 				}
 				
 				observations.put(square, seenByThisTile);

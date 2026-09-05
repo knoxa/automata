@@ -44,7 +44,7 @@ public class BoardObserver {
 					if (neighbourCol >= 0 && neighbourRow >= 0 && neighbourCol < boardWidth && neighbourRow < boardHeight ) {
 						
 						Square neighbour = grid[neighbourRow][neighbourCol];
-						Sense sense = new Sense(); sense.setSquare(neighbour); sense.setDirection(Compass.compass[step/2]);
+						Sense sense = new Sense(); sense.setSquare(neighbour); sense.setDirection(Compass.compass[step]);
 						sensed.add(sense);
 					}
 				}

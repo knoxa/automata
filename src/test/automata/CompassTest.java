@@ -100,4 +100,18 @@ class CompassTest {
 		assertEquals(Direction.SOUTH,  map.get(Direction.SOUTH));
 		assertEquals(Direction.EAST, map.get(Direction.WEST));		
 	}
+	
+	@Test
+	void cardinal() {
+		
+		assertTrue(Compass.isCardinal(Direction.NORTH));
+		assertTrue(Compass.isCardinal(Direction.SOUTH));
+		assertTrue(Compass.isCardinal(Direction.EAST));
+		assertTrue(Compass.isCardinal(Direction.WEST));
+		
+		assertFalse(Compass.isCardinal(Direction.NORTHEAST));
+		assertFalse(Compass.isCardinal(Direction.NORTHWEST));		
+		assertFalse(Compass.isCardinal(Direction.SOUTHEAST));
+		assertFalse(Compass.isCardinal(Direction.SOUTHWEST));
+	}
 }
