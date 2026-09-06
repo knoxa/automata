@@ -19,6 +19,10 @@ class CompassTest {
 		assertEquals(Direction.NORTH, Compass.getReturnDirection(Direction.SOUTH));
 		assertEquals(Direction.EAST,  Compass.getReturnDirection(Direction.WEST));
 		assertEquals(Direction.WEST,  Compass.getReturnDirection(Direction.EAST));
+		assertEquals(Direction.NORTHWEST, Compass.getReturnDirection(Direction.SOUTHEAST));
+		assertEquals(Direction.SOUTHEAST, Compass.getReturnDirection(Direction.NORTHWEST));
+		assertEquals(Direction.NORTHEAST, Compass.getReturnDirection(Direction.SOUTHWEST));
+		assertEquals(Direction.SOUTHWEST, Compass.getReturnDirection(Direction.NORTHEAST));
 	}
 
 	@Test
@@ -30,11 +34,19 @@ class CompassTest {
 		assertEquals(backward,   Compass.getOffsetX(Direction.WEST));
 		assertEquals(stationary, Compass.getOffsetX(Direction.NORTH));
 		assertEquals(stationary, Compass.getOffsetX(Direction.SOUTH));
+		assertEquals(forward,    Compass.getOffsetX(Direction.NORTHEAST));
+		assertEquals(backward,   Compass.getOffsetX(Direction.NORTHWEST));
+		assertEquals(forward,    Compass.getOffsetX(Direction.SOUTHEAST));
+		assertEquals(backward,   Compass.getOffsetX(Direction.SOUTHWEST));
 
 		assertEquals(stationary, Compass.getOffsetY(Direction.EAST));
 		assertEquals(stationary, Compass.getOffsetY(Direction.WEST));
 		assertEquals(backward,   Compass.getOffsetY(Direction.NORTH));
 		assertEquals(forward,    Compass.getOffsetY(Direction.SOUTH));
+		assertEquals(backward,   Compass.getOffsetY(Direction.NORTHEAST));
+		assertEquals(forward,    Compass.getOffsetY(Direction.SOUTHWEST));
+		assertEquals(backward,   Compass.getOffsetY(Direction.NORTHWEST));
+		assertEquals(forward,    Compass.getOffsetY(Direction.SOUTHEAST));
 	}
 	
 	@Test
@@ -59,6 +71,26 @@ class CompassTest {
 		assertEquals(2, orthogonal.size());
 		assertTrue(orthogonal.contains(Direction.NORTH));
 		assertTrue(orthogonal.contains(Direction.SOUTH));
+		
+		orthogonal = Compass.getOrthogonalDirections(Direction.NORTHWEST);
+		assertEquals(2, orthogonal.size());
+		assertTrue(orthogonal.contains(Direction.NORTHEAST));
+		assertTrue(orthogonal.contains(Direction.SOUTHWEST));
+		
+		orthogonal = Compass.getOrthogonalDirections(Direction.NORTHEAST);
+		assertEquals(2, orthogonal.size());
+		assertTrue(orthogonal.contains(Direction.NORTHWEST));
+		assertTrue(orthogonal.contains(Direction.SOUTHEAST));
+		
+		orthogonal = Compass.getOrthogonalDirections(Direction.SOUTHEAST);
+		assertEquals(2, orthogonal.size());
+		assertTrue(orthogonal.contains(Direction.NORTHEAST));
+		assertTrue(orthogonal.contains(Direction.SOUTHWEST));
+		
+		orthogonal = Compass.getOrthogonalDirections(Direction.SOUTHWEST);
+		assertEquals(2, orthogonal.size());
+		assertTrue(orthogonal.contains(Direction.NORTHWEST));
+		assertTrue(orthogonal.contains(Direction.SOUTHEAST));
 	}
 
 	@Test
@@ -69,6 +101,11 @@ class CompassTest {
 		assertEquals(Direction.SOUTH, map.get(Direction.EAST));
 		assertEquals(Direction.WEST,  map.get(Direction.SOUTH));
 		assertEquals(Direction.NORTH, map.get(Direction.WEST));
+		
+		assertEquals(Direction.NORTHEAST, map.get(Direction.NORTHWEST));
+		assertEquals(Direction.NORTHWEST, map.get(Direction.SOUTHWEST));
+		assertEquals(Direction.SOUTHWEST, map.get(Direction.SOUTHEAST));
+		assertEquals(Direction.SOUTHEAST, map.get(Direction.NORTHEAST));
 	}
 
 	@Test
@@ -79,6 +116,11 @@ class CompassTest {
 		assertEquals(Direction.NORTH, map.get(Direction.EAST));
 		assertEquals(Direction.EAST,  map.get(Direction.SOUTH));
 		assertEquals(Direction.SOUTH, map.get(Direction.WEST));
+		
+		assertEquals(Direction.NORTHEAST, map.get(Direction.SOUTHEAST));
+		assertEquals(Direction.NORTHWEST, map.get(Direction.NORTHEAST));
+		assertEquals(Direction.SOUTHWEST, map.get(Direction.NORTHWEST));
+		assertEquals(Direction.SOUTHEAST, map.get(Direction.SOUTHWEST));
 	}
 	
 	@Test
@@ -89,6 +131,11 @@ class CompassTest {
 		assertEquals(Direction.EAST, map.get(Direction.EAST));
 		assertEquals(Direction.NORTH,  map.get(Direction.SOUTH));
 		assertEquals(Direction.WEST, map.get(Direction.WEST));
+
+		assertEquals(Direction.NORTHWEST, map.get(Direction.SOUTHWEST));
+		assertEquals(Direction.NORTHEAST, map.get(Direction.SOUTHEAST));
+		assertEquals(Direction.SOUTHWEST, map.get(Direction.NORTHWEST));
+		assertEquals(Direction.SOUTHEAST, map.get(Direction.NORTHEAST));
 	}
 	
 	@Test
@@ -99,6 +146,11 @@ class CompassTest {
 		assertEquals(Direction.WEST, map.get(Direction.EAST));
 		assertEquals(Direction.SOUTH,  map.get(Direction.SOUTH));
 		assertEquals(Direction.EAST, map.get(Direction.WEST));		
+
+		assertEquals(Direction.NORTHWEST, map.get(Direction.NORTHEAST));
+		assertEquals(Direction.NORTHEAST, map.get(Direction.NORTHWEST));
+		assertEquals(Direction.SOUTHWEST, map.get(Direction.SOUTHEAST));
+		assertEquals(Direction.SOUTHEAST, map.get(Direction.SOUTHWEST));
 	}
 	
 	@Test
