@@ -21,6 +21,7 @@ import cakes.files.ReadFiles;
 import cells.Square;
 import orient.Partitioner;
 import tiles.Pentomino;
+import tiles.PentominoIdentifier;
 import tiles.PentominoType;
 import worlds.Board;
 import worlds.BoardManager;
@@ -53,6 +54,7 @@ public class Classify {
 				
 				System.out.println(file.getName());
 				Board board = BoardManager.loadFromXml(new FileInputStream(file));
+				board.setIdentifier(new PentominoIdentifier());
 				Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
 				
 				if ( partitionMap.keySet().size() == 12 ) {
@@ -61,7 +63,7 @@ public class Classify {
 					
 					if ( pentominoes.keySet().size() == 12 ) {
 						
-						String identifier = BoardManager.identifySolution(board.getGrid());
+						String identifier = board.getIdentifier().identifySolution(board.getGrid());
 						
 						System.out.println(file.getName() + " .. " + identifier + " = " + solutionMap.get(identifier));
 						

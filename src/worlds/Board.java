@@ -12,6 +12,7 @@ public class Board {
 	private Square[][] grid;
 	private int width, height;
 	private Set<Square> squares;
+	private BoardIdentifier identifier;
 
 	public Board(int width, int height) {
 
@@ -61,6 +62,14 @@ public class Board {
 
 	public Square[][] getGrid() {
 		return grid;
+	}
+
+	public BoardIdentifier getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(BoardIdentifier identifier) {
+		this.identifier = identifier;
 	}
 	
 }

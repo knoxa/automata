@@ -28,6 +28,7 @@ import observe.BoardObserver;
 import observe.SquareObserver;
 import orient.Partitioner;
 import tiles.Pentomino;
+import tiles.PentominoIdentifier;
 import tiles.PentominoMove;
 import tiles.PentominoType;
 import tiles.Tile;
@@ -46,8 +47,9 @@ public class SolutionMap {
 
 		//Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/knoxa.github.io/pentominoes/solutions/6x10/60.xml"));
 		Board board = BoardManager.loadFromXml(new FileInputStream("/D:/GitHub/knoxa.github.io/pentominoes/solutions/4x15/213.xml"));
+		board.setIdentifier(new PentominoIdentifier());
 		//Board board = BoardManager.loadFromXml(new FileInputStream("experiments/out.xml"));
-		System.out.println(BoardManager.identifySolution(board.getGrid()));
+		System.out.println(board.getIdentifier().identifySolution(board.getGrid()));
 		
 		Map<Integer, Set<Square>> partitionMap = Partitioner.partition(board.getSquares());
 		Map<Square, Set<Sense>> environment = BoardObserver.lookAbout(board);

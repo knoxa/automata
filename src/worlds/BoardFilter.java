@@ -19,10 +19,14 @@ public class BoardFilter extends BaseFilter {
 	private Square[][] grid;
 	private Square currentSquare;
 	private Map<Square, Set<Sense>> environment;
+	private String identifier = null;
+	private StringBuffer text;
 
 	@Override
 	public void startElement(String uri, String localName, String qname, Attributes attr) throws SAXException {
 			
+		text = new StringBuffer();
+		
 		if ( qname.equals("board") ) {
 			
 			String width  = attr.getValue("width");
@@ -43,7 +47,7 @@ public class BoardFilter extends BaseFilter {
 		}
 		else if ( qname.equals("identifier") ) {
 			
-			// ignore the identifer 
+			// do nothing at this time 
 		}
 		else {
 			
@@ -77,7 +81,29 @@ public class BoardFilter extends BaseFilter {
 	}
 	
 
+	@Override
+	public void endElement(String uri, String localName, String qname) throws SAXException {
+
+		if ( qname.equals("identifier") ) {
+			
+			identifier = text.toString();
+		}
+	}
+
+
+	@Override
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		
+		text.append(ch, start, length);
+	}
+
+
 	public Board getBoard() {		
 		return board;
+	}
+	
+	
+	public String getIdentifier() {
+		return this.identifier;
 	}
 }
