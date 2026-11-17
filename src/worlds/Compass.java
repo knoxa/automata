@@ -109,5 +109,11 @@ public class Compass {
 		Integer value = compassMap.get(direction);
 		return value %2 == 0;
 	}
+	
+	public static float getBearing(Direction direction) {
+		
+		float bearing = (float) 45.0 * (float) compassMap.get(direction);
+		return bearing;
+	}
 
 }
