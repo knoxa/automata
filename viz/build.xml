@@ -26,4 +26,8 @@
 		<xslt in="../experiments/out.xml" out="../experiments/out.svg" style="plane.xsl" force="true"/>
 	</target>
 
+	<target name="cups">
+		<xslt in="../experiments/board.xml" out="../experiments/out.svg" style="board.xsl" force="true"/>
+	</target>
+
 </project>
