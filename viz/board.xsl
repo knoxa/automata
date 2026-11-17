@@ -44,7 +44,7 @@ g {
 	<xsl:variable name="x" select="@col * 50"/>
 	<xsl:variable name="y" select="@row * 50"/>
 	
-	<g transform="translate({$x},{$y})" class="{@pentomino}">
+	<g id="{@label}" transform="translate({$x},{$y})" class="{@pentomino}">
 		<xsl:apply-templates select="*"/>
 		<rect x="-20" y="-20" width="40" height="40"/>
 	</g>
